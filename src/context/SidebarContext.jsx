@@ -4,7 +4,6 @@ const { createContext, useState } = require("react");
 const initialValue = {
   collapsed: false,
   setCollapsed: () => {},
-  currentRoute: "",
 };
 
 export const SidebarContext = createContext(initialValue);

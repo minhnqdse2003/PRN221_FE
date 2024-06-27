@@ -1,9 +1,8 @@
-import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import Sidebar from "@/components/Sidebar";
 import SidebarProvider from "@/context/SidebarContext";
-
-const inter = Inter({ subsets: ["latin"] });
+import SessionWrapper from "@/context/SessionWrapper";
+import Provider from "@/utils/Providers";
 
 export const metadata = {
   title: "Create Next App",
@@ -12,13 +11,17 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className="flex">
-        <SidebarProvider>
-          <Sidebar />
-        </SidebarProvider>
-        <div className="w-4/5">{children}</div>
-      </body>
-    </html>
+    <SessionWrapper>
+      <html lang="en">
+        <body className="flex overflow-hidden" suppressHydrationWarning={true}>
+          <SidebarProvider>
+            <Sidebar />
+          </SidebarProvider>
+          <div className="w-full bg-slate-50">
+            <Provider>{children}</Provider>
+          </div>
+        </body>
+      </html>
+    </SessionWrapper>
   );
 }
