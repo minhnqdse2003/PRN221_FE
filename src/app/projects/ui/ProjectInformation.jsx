@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Tabs, Tab, Card, CardBody, Chip, Avatar } from "@nextui-org/react";
-import { FaRegAddressCard, FaUser, FaRegUser } from "react-icons/fa";
+import { FaRegAddressCard, FaUser } from "react-icons/fa";
 import { MdOutlineDescription, MdManageAccounts } from "react-icons/md";
+import { BiDetail } from "react-icons/bi";
 
 const items = [
   {
@@ -27,7 +28,15 @@ const ProjectInformation = () => {
       }}
       className="w-full"
     >
-      <Tab key="details" title="Details">
+      <Tab
+        key="details"
+        title={
+          <div className="flex items-center space-x-2">
+            <BiDetail />
+            <span className="font-semibold">Details</span>
+          </div>
+        }
+      >
         <Card className="p-4 bg-transparent" shadow="none" radius="none">
           <CardBody>
             {items.map((item, index) => (
@@ -57,7 +66,7 @@ const ProjectInformation = () => {
                   <p className="text-sm flex flex-row items-center gap-2">
                     <FaUser /> Team
                   </p>
-                  <div className="w-full flex flex-row flex-wrap">
+                  <div className="w-full flex flex-row flex-wrap gap-2">
                     {item.team.map((item) => (
                       <Chip
                         variant="flat"

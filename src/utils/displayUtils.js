@@ -29,3 +29,16 @@ export const calculateTimePassed = (then) => {
 
   return timePassedString;
 };
+
+export function getTodayFormatted() {
+  const today = new Date();
+
+  const month = today.toLocaleDateString("en-US", { month: "long" }); // Get month name (e.g., January)
+  const day = today.getDate().toString().padStart(2, "0"); // Get day with two-digit padding (e.g., 01)
+
+  return `${month} ${day}`;
+}
+
+export function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

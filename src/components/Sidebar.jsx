@@ -13,6 +13,7 @@ import { BsCartCheckFill } from "react-icons/bs";
 import { SidebarContext } from "@/context/SidebarContext";
 import { usePathname } from "next/navigation";
 import UserSection from "./UserSection";
+import { useSession } from "next-auth/react";
 
 const iconSize = {
   size: 24,

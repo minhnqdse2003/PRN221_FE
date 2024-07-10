@@ -1,9 +1,16 @@
 "use client";
+import { NextUIProvider } from "@nextui-org/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Provider = ({ children }) => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -15,11 +22,13 @@ const Provider = ({ children }) => {
         },
       })
   );
-  return (
+  return isClient ? (
     <QueryClientProvider client={queryClient}>
       <ReactQueryDevtools initialIsOpen={false} />
-      {children}
+      <NextUIProvider>{children}</NextUIProvider>
     </QueryClientProvider>
+  ) : (
+    <></>
   );
 };
 

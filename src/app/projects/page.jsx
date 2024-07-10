@@ -4,7 +4,7 @@ import ProjectSection from "./ui/ProjectSection";
 
 const page = () => {
   return (
-    <div>
+    <div className="h-[100vh] overflow-y-scroll">
       <Header />
       <ProjectSection />
     </div>

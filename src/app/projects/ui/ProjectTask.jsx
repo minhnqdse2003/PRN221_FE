@@ -1,5 +1,12 @@
+"use client";
 import React, { useState } from "react";
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
+import { FaTasks } from "react-icons/fa";
+import { RiTeamLine } from "react-icons/ri";
+import { TbReport } from "react-icons/tb";
+import TaskTab from "./TaskTab";
+import TeamTab from "./TeamTab";
+import ReportsTab from "./ReportsTab";
 
 const ProjectTask = () => {
   const [selected, setSelected] = useState("tasks");
@@ -16,33 +23,38 @@ const ProjectTask = () => {
         tab: "max-w-fit px-0 h-12",
       }}
     >
-      <Tab key="tasks" title="Tasks">
-        <Card shadow="none">
-          <CardBody>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
-          </CardBody>
-        </Card>
+      <Tab
+        key="tasks"
+        title={
+          <div className="flex items-center space-x-2">
+            <FaTasks />
+            <span className="font-semibold">Task</span>
+          </div>
+        }
+      >
+        <TaskTab />
       </Tab>
-      <Tab key="team" title="Team">
-        <Card>
-          <CardBody>
-            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-            nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-            reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-            pariatur.
-          </CardBody>
-        </Card>
+      <Tab
+        key="team"
+        title={
+          <div className="flex items-center space-x-2">
+            <RiTeamLine />
+            <span className="font-semibold">Team</span>
+          </div>
+        }
+      >
+        <TeamTab />
       </Tab>
-      <Tab key="reports" title="Reports">
-        <Card>
-          <CardBody>
-            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-            officia deserunt mollit anim id est laborum.
-          </CardBody>
-        </Card>
+      <Tab
+        key="reports"
+        title={
+          <div className="flex items-center space-x-2">
+            <TbReport />
+            <span className="font-semibold">Reports</span>
+          </div>
+        }
+      >
+        <ReportsTab />
       </Tab>
     </Tabs>
   );

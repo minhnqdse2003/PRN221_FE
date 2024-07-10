@@ -1,14 +1,19 @@
-import React from "react";
 import {
-  Card,
-  CardHeader,
-  CardBody,
-  Divider,
-  Chip,
   Avatar,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  useDisclosure,
 } from "@nextui-org/react";
+import React from "react";
+import ReportModalAdd from "./ReportModalAdd";
+import { IoIosAdd } from "react-icons/io";
 
-const FeedbackTasks = () => {
+const ReportsTab = () => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const items = [
     {
       name: "Project 1",
@@ -54,6 +59,7 @@ const FeedbackTasks = () => {
       date: "12-02-2024,6:04 PM",
     },
   ];
+
   const getColor = (status) => {
     switch (status) {
       case "Accepted":
@@ -64,12 +70,23 @@ const FeedbackTasks = () => {
         return "warning";
     }
   };
+
   return (
     <div className="flex flex-col gap-4 bg-white p-6 rounded-xl">
-      <p className="font-semibold text-2xl">Work Report</p>
+      <div className="flex flex-row justify-between">
+        <p className="font-semibold text-xl">Work Report</p>
+        <Button onPress={onOpen} startContent={<IoIosAdd />}>
+          Add Report
+        </Button>
+        <ReportModalAdd
+          isOpen={isOpen}
+          onOpen={onOpen}
+          onOpenChange={onOpenChange}
+        />
+      </div>
       <div className="grid grid-cols-3 gap-4">
         {items.map((item, index) => (
-          <Card key={item.name}>
+          <Card key={item.name} isPressable>
             <CardHeader className="flex gap-3">
               <div className="flex flex-row justify-between w-full">
                 <p className="text-md text-blue-600 font-bold underline">
@@ -108,4 +125,4 @@ const FeedbackTasks = () => {
   );
 };
 
-export default FeedbackTasks;
+export default ReportsTab;

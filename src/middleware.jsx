@@ -15,20 +15,20 @@ const systemRoute = [
 const assetExtensions = ["js", "css", "png", "jpg", "jpeg", "svg", "ico"];
 
 export const middleware = async (req) => {
-  const { pathname: path } = req.nextUrl;
-  const currentUser = req.cookies.get(
-    process.env.NODE_ENV === "development"
-      ? "next-auth.session-token"
-      : "__Secure-next-auth.session-token"
-  );
+  // const { pathname: path } = req.nextUrl;
+  // const currentUser = req.cookies.get(
+  //   process.env.NODE_ENV === "development"
+  //     ? "next-auth.session-token"
+  //     : "__Secure-next-auth.session-token"
+  // );
 
-  if (currentUser && path.startsWith("/login")) {
-    return Response.redirect(new URL("/", req.url));
-  }
+  // if (currentUser && path.startsWith("/login")) {
+  //   return Response.redirect(new URL("/", req.url));
+  // }
 
-  if (!currentUser && systemRoute.includes(getUrlSegments(path))) {
-    return Response.redirect(new URL("/login", req.url));
-  }
+  // if (!currentUser && systemRoute.includes(getUrlSegments(path))) {
+  //   return Response.redirect(new URL("/login", req.url));
+  // }
 
   return NextResponse.next();
 };
