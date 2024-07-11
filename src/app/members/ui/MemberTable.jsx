@@ -15,128 +15,190 @@ import {
   DropdownItem,
   Chip,
   Pagination,
-  Avatar,
+  User,
+  Link,
 } from "@nextui-org/react";
 import {
   IoMdAdd as PlusIcon,
   IoMdArrowDropdown as ChevronDownIcon,
 } from "react-icons/io";
 import { IoSearchOutline as SearchIcon } from "react-icons/io5";
-import { capitalize } from "@/utils/displayUtils";
-import { FaChevronRight } from "react-icons/fa";
-import { permanentRedirect, redirect, useRouter } from "next/navigation";
+import { capitalize, getTodayFormatted } from "@/utils/displayUtils";
+import { FaChevronRight, FaFemale, FaMale } from "react-icons/fa";
+
 const statusColorMap = {
-  easy: "success",
-  medium: "warning",
-  hard: "danger",
+  approved: "success",
+  pending: "warning",
 };
 
 const columns = [
   { name: "ID", uid: "id", sortable: true },
-  { name: "TITLE", uid: "title", sortable: true },
-  { name: "DESCRIPTION", uid: "description" },
-  { name: "DURATION", uid: "duration", sortable: true },
-  { name: "LEVEL", uid: "level", sortable: true },
-  { name: "USER", uid: "user" },
-  { name: "", uid: "action" },
+  { name: "NAME", uid: "name", sortable: true },
+  { name: "DOB", uid: "dob", sortable: true },
+  { name: "PHONE", uid: "phone" },
+  { name: "ADDRESS", uid: "address" },
+  { name: "GPA", uid: "gpa", sortable: true },
+  { name: "MAJOR", uid: "major" },
+  { name: "POSITION", uid: "desired-position" },
+  { name: "GENDER", uid: "gender", sortable: true },
+  { name: "STATUS", uid: "status", sortable: true },
+  { name: "CV", uid: "link" },
 ];
 
 const statusOptions = [
-  { name: "Easy", uid: "easy" },
-  { name: "Medium", uid: "medium" },
-  { name: "Hard", uid: "hard" },
+  { name: "Approved", uid: "approved" },
+  { name: "Pending", uid: "pending" },
 ];
 
-const trainingPrograms = [
+const genderOptions = [
+  { name: "Male", uid: "male" },
+  { name: "Female", uid: "female" },
+];
+
+const users = [
   {
     id: 1,
-    title: "AWS For Beginner",
-    description:
-      "This course belong to whose was wanted to join in training program",
-    duration: "24 hours",
-    level: "easy",
-    user: ["Nguyen Tran My Anh", "Tran Le Anh Thu", "Nguyen Duc Manh"],
+    name: "Nguyen Tran Trung Anh",
+    dob: getTodayFormatted(),
+    gender: "male",
+    email: "minhnqdse172303@fpt.edu.vn",
+    phone: "0916544231",
+    address: "445/1/85 Tan Thoi Nhat,Q.1,TP.HCM",
+    gpa: 3.5,
+    link: "https://www.facebook.com/",
+    major: "Software Engineer",
+    status: "pending",
+    "desired-position": "Internship",
   },
   {
     id: 2,
-    title: "Introduction to Cloud Computing",
-    description:
-      "This course provides a foundational understanding of cloud concepts and services.",
-    duration: "8 hours",
-    level: "easy",
-    user: ["Le Thi Hong Nhung", "Pham Minh Hien", "Dao Quang Huy"],
+    name: "Le Thi Thu Ha",
+    dob: new Date("1998-05-20").toLocaleDateString(), // Example formatted date
+    gender: "female",
+    email: "lethithuha@gmail.com",
+    phone: "0987654321",
+    address: "123 Nguyen Van Cu, Q.3, TP.HCM",
+    gpa: 3.8,
+    link: "https://www.linkedin.com/in/lethithuha/",
+    major: "Computer Science",
+    status: "approved",
+    "desired-position": "Full-Time",
   },
   {
     id: 3,
-    title: "Building Serverless Applications on AWS",
-    description:
-      "Learn how to design and deploy serverless applications using AWS Lambda and API Gateway.",
-    duration: "16 hours",
-    level: "medium",
-    user: ["Tran Quoc Viet", "Nguyen Thi My Chau", "Cao Minh Tri"],
+    name: "Tran Minh Duc",
+    dob: new Date("2000-10-12").toLocaleDateString(),
+    gender: "male",
+    email: "tranminhduc@example.com",
+    phone: "0123456789",
+    address: "567/8, Truong Chinh, Q.12, TP.HCM",
+    gpa: 3.2,
+    link: "", // Optional link
+    major: "Data Science",
+    status: "pending",
+    "desired-position": "Part-Time",
   },
   {
-    id: 4,
-    title: "Securing Your Cloud Infrastructure on AWS",
-    description:
-      "Gain insights into implementing best practices for securing your AWS resources.",
-    duration: "20 hours",
-    level: "hard",
-    user: ["Le Van Nam", "Nguyen Thi Phuong Thao", "Pham Xuan Dung"],
+    id: 8,
+    name: "Hoang Thi Mai",
+    dob: new Date("1999-02-14").toLocaleDateString(),
+    gender: "female",
+    email: "hoangthimai@yahoo.com",
+    phone: "0943215678",
+    address: "890 Tran Hung Dao, Q.5, TP.HCM",
+    gpa: 3.7,
+    link: "https://github.com/hoangthimai",
+    major: "Web Development",
+    status: "approved",
+    "desired-position": "Freelance",
   },
   {
-    id: 5,
-    title: "Designing Databases for Scalability on AWS",
-    description:
-      "Explore strategies for designing and optimizing databases for high availability and performance in the cloud.",
-    duration: "12 hours",
-    level: "medium",
-    user: ["Tran Ngoc Anh", "Nguyen Huu Dat", "Cao Thi Thu Trang"],
+    id: 9,
+    name: "Phan Van Nam",
+    dob: new Date("2001-08-07").toLocaleDateString(),
+    gender: "male",
+    email: "phanvannam@hotmail.com",
+    phone: "0168901234",
+    address: "321 Le Van Sy, Q.Thu Duc, TP.HCM",
+    gpa: 3.0,
+    link: "", // Optional link
+    major: "Information Technology",
+    status: "pending",
+    "desired-position": "Full-Time",
   },
   {
-    id: 6,
-    title: "Deploying Containers on AWS ECS",
-    description:
-      "Learn how to leverage Amazon Elastic Container Service (ECS) for container orchestration.",
-    duration: "18 hours",
-    level: "medium",
-    user: ["Le Minh Quang", "Nguyen Thi Hong Nhung", "Pham Xuan Nam"],
+    id: 11,
+    name: "Dao Thi My Linh",
+    dob: new Date("1997-11-23").toLocaleDateString(),
+    gender: "female",
+    email: "daothimylinh@gmail.com",
+    phone: "0976543210",
+    address: "678 Nguyen Trai, Q.10, TP.HCM",
+    gpa: 3.9,
+    link: "https://www.linkedin.com/in/daothimylinh/",
+    major: "Computer Science",
+    status: "approved",
+    "desired-position": "Full-Time",
+  },
+  {
+    id: 21,
+    name: "Cao Xuan Nam",
+    dob: new Date("2002-03-05").toLocaleDateString(),
+    gender: "male",
+    email: "caoxuannam@outlook.com",
+    phone: "0123456789",
+    address: "987 Le Loi, Q.3, TP.HCM",
+    gpa: 3.3,
+    link: "https://github.com/caoxuannam",
+    major: "Information Technology",
+    status: "pending",
+    "desired-position": "Part-Time",
   },
 ];
 
-const TrainingProgramTable = () => {
+const MemberTable = () => {
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
   const [statusFilter, setStatusFilter] = useState("all");
+  const [genderFilter, setGenderFilter] = useState("all");
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [sortDescriptor, setSortDescriptor] = useState({
-    column: "age",
+    column: "id",
     direction: "ascending",
   });
-  const router = useRouter();
   const [page, setPage] = useState(1);
 
   const hasSearchFilter = Boolean(filterValue);
 
   const filteredItems = useMemo(() => {
-    let filteredTrainingPrograms = [...trainingPrograms];
+    let filteredUsers = [...users];
 
     if (hasSearchFilter) {
-      filteredTrainingPrograms = filteredTrainingPrograms.filter((user) =>
-        user.title.toLowerCase().includes(filterValue.toLowerCase())
+      filteredUsers = filteredUsers.filter((user) =>
+        user.name.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
+
     if (
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredTrainingPrograms = filteredTrainingPrograms.filter((user) =>
-        Array.from(statusFilter).includes(user.level)
+      filteredUsers = filteredUsers.filter((user) =>
+        Array.from(statusFilter).includes(user.status)
       );
     }
 
-    return filteredTrainingPrograms;
-  }, [trainingPrograms, filterValue, statusFilter]);
+    if (
+      genderFilter !== "all" &&
+      Array.from(genderFilter).length !== genderOptions.length
+    ) {
+      filteredUsers = filteredUsers.filter((user) =>
+        Array.from(genderFilter).includes(user.gender)
+      );
+    }
+
+    return filteredUsers;
+  }, [users, filterValue, statusFilter, genderFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -157,34 +219,45 @@ const TrainingProgramTable = () => {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = useCallback((program, columnKey) => {
-    const cellValue = program[columnKey];
+  const renderCell = useCallback((user, columnKey) => {
+    const cellValue = user[columnKey];
 
     switch (columnKey) {
-      case "level":
+      case "status":
         return (
           <Chip
             className="capitalize"
-            color={statusColorMap[program.level]}
+            color={statusColorMap[user.status]}
             size="sm"
             variant="flat"
           >
             {cellValue}
           </Chip>
         );
-      case "user":
+      case "gender":
+        return (
+          <div>
+            {cellValue === "female" ? (
+              <Chip className="capitalize" size="sm" variant="flat">
+                <FaFemale />
+              </Chip>
+            ) : (
+              <Chip className="capitalize" size="sm" variant="flat">
+                <FaMale />
+              </Chip>
+            )}
+          </div>
+        );
+      case "name":
         return (
           <div className="flex -space-x-3 rtl:space-x-reverse">
-            {program.user.length > 0
-              ? program.user.map((item) => (
-                  <Avatar
-                    name={item}
-                    size="sm"
-                    key={item}
-                    getInitials={(name) => name.charAt(0)}
-                  />
-                ))
-              : "No User Join"}
+            <User
+              avatarProps={{ radius: "lg", name: cellValue.charAt(0) }}
+              description={user.email}
+              name={cellValue}
+            >
+              {user.email}
+            </User>
           </div>
         );
       case "action":
@@ -193,10 +266,16 @@ const TrainingProgramTable = () => {
             isIconOnly
             size="sm"
             variant="light"
-            onClick={() => onDetailsTrainingProgram(program)}
+            onClick={() => onDetailsTrainingProgram(user)}
           >
             <FaChevronRight className="text-default-300" />
           </Button>
+        );
+      case "link":
+        return (
+          <Link href={cellValue} showAnchorIcon size="sm" isExternal>
+            Link
+          </Link>
         );
       default:
         return cellValue;
@@ -229,10 +308,6 @@ const TrainingProgramTable = () => {
     setPage(1);
   }, []);
 
-  const onDetailsTrainingProgram = (program) => {
-    router.push(`/trainingprograms/${program.id}`);
-  };
-
   const topContent = useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
@@ -253,15 +328,39 @@ const TrainingProgramTable = () => {
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
                 >
-                  Level
+                  Gender
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
                 disallowEmptySelection
-                aria-label="Table Columns"
+                aria-label="Status"
+                closeOnSelect={false}
+                selectedKeys={genderFilter}
+                selectionMode="multiple"
+                onSelectionChange={setGenderFilter}
+              >
+                {genderOptions.map((status) => (
+                  <DropdownItem key={status.uid} className="capitalize">
+                    {capitalize(status.name)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  endContent={<ChevronDownIcon className="text-small" />}
+                  variant="flat"
+                >
+                  Status
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Gender"
                 closeOnSelect={false}
                 selectedKeys={statusFilter}
-                selectionMode="single"
+                selectionMode="multiple"
                 onSelectionChange={setStatusFilter}
               >
                 {statusOptions.map((status) => (
@@ -281,7 +380,8 @@ const TrainingProgramTable = () => {
   }, [
     filterValue,
     statusFilter,
-    trainingPrograms.length,
+    genderFilter,
+    users.length,
     onSearchChange,
     hasSearchFilter,
   ]);
@@ -331,7 +431,7 @@ const TrainingProgramTable = () => {
       bottomContent={bottomContent}
       bottomContentPlacement="outside"
       classNames={{
-        wrapper: "max-h-[382px]",
+        wrapper: "max-h-[400px] w-full",
       }}
       selectedKeys={selectedKeys}
       selectionMode="single"
@@ -340,6 +440,7 @@ const TrainingProgramTable = () => {
       topContentPlacement="outside"
       onSelectionChange={setSelectedKeys}
       onSortChange={setSortDescriptor}
+      className="w-full"
     >
       <TableHeader columns={columns}>
         {(column) => (
@@ -368,4 +469,4 @@ const TrainingProgramTable = () => {
   );
 };
 
-export default TrainingProgramTable;
+export default MemberTable;

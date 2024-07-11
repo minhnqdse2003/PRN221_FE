@@ -19,6 +19,7 @@ import {
   Button,
   CardHeader,
   useDisclosure,
+  Chip,
 } from "@nextui-org/react";
 
 const TaskTab = () => {
@@ -320,11 +321,10 @@ const TaskTab = () => {
                   <p className="font-semibold text-md">{item.title}</p>
                   <span className="font-semibold text-sm text-black/50">
                     {item?.title === "Today" ? (
-                      <p>
-                        {`${getTodayFormatted()} • ${
-                          item.count
-                        } tasks remaining to completed`}
-                      </p>
+                      <div className="flex flew-row items-center gap-2">
+                        <Chip>{getTodayFormatted()}</Chip>
+                        <p>{`${item.count} tasks remaining to completed`}</p>
+                      </div>
                     ) : (
                       <p>{item.count} tasks remaining to completed</p>
                     )}
