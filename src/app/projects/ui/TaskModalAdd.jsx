@@ -12,6 +12,9 @@ import {
   RadioGroup,
   Radio,
   DatePicker,
+  Select,
+  SelectItem,
+  Chip,
 } from "@nextui-org/react";
 import React, { useState } from "react";
 
@@ -134,23 +137,36 @@ const TaskModalAdd = (props) => {
             <ModalHeader className="flex flex-col gap-1">Add Task</ModalHeader>
             <ModalBody>
               <Input autoFocus label="Task Title" />
-              <Autocomplete
-                defaultItems={users}
-                variant="bordered"
+              <Select
+                items={users}
                 label="Assigned to"
+                variant="bordered"
+                isMultiline={true}
+                selectionMode="multiple"
                 placeholder="Select a user"
-                labelPlacement="inside"
-                className="w-full font-semibold"
-                classNames={{ listboxWrapper: "bg-white" }}
+                labelPlacement="outside"
+                classNames={{
+                  base: "max-w-xs",
+                  trigger: "min-h-12 py-2",
+                }}
+                renderValue={(items) => {
+                  return (
+                    <div className="flex flex-wrap gap-2">
+                      {items.map((item) => (
+                        <Chip key={item.key}>{item.data?.name}</Chip>
+                      ))}
+                    </div>
+                  );
+                }}
               >
                 {(user) => (
-                  <AutocompleteItem key={user.id} textValue={user.name}>
+                  <SelectItem key={user.id} textValue={user.name}>
                     <div className="flex gap-2 items-center">
                       <Avatar
-                        name={user.name}
+                        alt={user.name}
+                        className="flex-shrink-0"
                         size="sm"
-                        key={user.name}
-                        getInitials={(name) => name.charAt(0)}
+                        src={user.avatar}
                       />
                       <div className="flex flex-col">
                         <span className="text-small">{user.name}</span>
@@ -159,9 +175,9 @@ const TaskModalAdd = (props) => {
                         </span>
                       </div>
                     </div>
-                  </AutocompleteItem>
+                  </SelectItem>
                 )}
-              </Autocomplete>
+              </Select>
               <RadioGroup
                 value={selected}
                 onValueChange={setSelected}

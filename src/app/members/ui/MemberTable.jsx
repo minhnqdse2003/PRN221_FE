@@ -17,6 +17,7 @@ import {
   Pagination,
   User,
   Link,
+  useDisclosure,
 } from "@nextui-org/react";
 import {
   IoMdAdd as PlusIcon,
@@ -25,6 +26,7 @@ import {
 import { IoSearchOutline as SearchIcon } from "react-icons/io5";
 import { capitalize, getTodayFormatted } from "@/utils/displayUtils";
 import { FaChevronRight, FaFemale, FaMale } from "react-icons/fa";
+import AddMemberModal from "./AddMemberModal";
 
 const statusColorMap = {
   approved: "success",
@@ -111,6 +113,7 @@ const users = [
     major: "Web Development",
     status: "approved",
     "desired-position": "Freelance",
+    role: "heheheh",
   },
   {
     id: 9,
@@ -162,6 +165,7 @@ const MemberTable = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [genderFilter, setGenderFilter] = useState("all");
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [sortDescriptor, setSortDescriptor] = useState({
     column: "id",
     direction: "ascending",
@@ -370,7 +374,7 @@ const MemberTable = () => {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
+            <Button onPress={onOpen} color="primary" endContent={<PlusIcon />}>
               Add New
             </Button>
           </div>
@@ -426,46 +430,52 @@ const MemberTable = () => {
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   return (
-    <Table
-      aria-label="Example table with custom cells, pagination and sorting"
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      classNames={{
-        wrapper: "max-h-[400px] w-full",
-      }}
-      selectedKeys={selectedKeys}
-      selectionMode="single"
-      sortDescriptor={sortDescriptor}
-      topContent={topContent}
-      topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
-      onSortChange={setSortDescriptor}
-      className="w-full"
-    >
-      <TableHeader columns={columns}>
-        {(column) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody emptyContent={"No Training Program Found"} items={sortedItems}>
-        {(item) => (
-          <TableRow
-            key={item.id}
-            onClick={() => onDetailsTrainingProgram(item)}
-          >
-            {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <div>
+      <Table
+        aria-label="Example table with custom cells, pagination and sorting"
+        bottomContent={bottomContent}
+        bottomContentPlacement="outside"
+        classNames={{
+          wrapper: "max-h-[400px] w-full",
+        }}
+        selectedKeys={selectedKeys}
+        selectionMode="single"
+        sortDescriptor={sortDescriptor}
+        topContent={topContent}
+        topContentPlacement="outside"
+        onSelectionChange={setSelectedKeys}
+        onSortChange={setSortDescriptor}
+        className="w-full"
+      >
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === "actions" ? "center" : "start"}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody
+          emptyContent={"No Training Program Found"}
+          items={sortedItems}
+        >
+          {(item) => (
+            <TableRow
+              key={item.id}
+              onClick={() => onDetailsTrainingProgram(item)}
+            >
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <AddMemberModal isOpen={isOpen} onOpenChange={onOpenChange} />
+    </div>
   );
 };
 

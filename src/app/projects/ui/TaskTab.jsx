@@ -21,6 +21,7 @@ import {
   useDisclosure,
   Chip,
 } from "@nextui-org/react";
+import { useGetProject } from "@/data/useProjects";
 
 const TaskTab = () => {
   const [filterTask, setFilterTask] = useState("My Task");
@@ -276,6 +277,8 @@ const TaskTab = () => {
       ],
     },
   ];
+
+  // const { data: items, isLoading, error } = useGetProject();
 
   return (
     <Card shadow="none">
