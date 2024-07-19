@@ -27,20 +27,20 @@ export const sidebarItems = [
     role: "business",
   },
   {
-    content: "Product",
-    href: "/product",
+    content: "Training Programs Management",
+    href: "/trainingprograms",
     icon: <IoFastFoodSharp {...iconSize} />,
     role: "business",
   },
   {
-    content: "User",
-    href: "/user",
+    content: "Intern Management",
+    href: "/members",
     icon: <RiUserSettingsFill {...iconSize} />,
     role: "business",
   },
   {
     content: "Order",
-    href: "/order",
+    href: "/trainingprograms",
     icon: <BsCartCheckFill {...iconSize} />,
     role: "business",
   },
@@ -80,8 +80,8 @@ const Sidebar = () => {
               height={64}
             />
             <p aria-disabled="true" className="side-content">
-              Kios System
-            </p>
+              Intern Managerment System
+                          </p>
           </Link>
           <button
             className={`flex items-center justify-center cursor-pointer hover:bg-btn ${

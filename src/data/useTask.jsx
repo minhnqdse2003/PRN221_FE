@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTasks,getTask, getTasksByFilter, assignUserToTask, removeUserFromTask,createTask, updateTask,deleteTask} from "../server/taskAction"
+import { getTasks,getTask, getTasksByFilter, assignUserToTask, removeUserFromTask,createTask, updateTask,deleteTask} from "@/server/taskAction"
 export const useGetTasks = () => {
   return useQuery({
     queryKey: ["tasks"],

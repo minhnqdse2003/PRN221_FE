@@ -17,22 +17,27 @@ export const getTasks = async () => {
 
   };
 
-  export const getTasksbyFilter = async ({ ProjectID, Status, Priority, PageNumber, PageSize }) => {
-    let queryParams = [];
-    if (ProjectID) queryParams.push(`ProjectID=${ProjectID}`);
-    if (Status) queryParams.push(`Status=${Status}`);
-    if (Priority) queryParams.push(`Priority=${Priority}`);
-    if (PageNumber) queryParams.push(`PageNumber=${PageNumber}`);
-    if (PageSize) queryParams.push(`PageSize=${PageSize}`);
+  export const getTasksByFilter = async ({ ProjectID, Status, Priority, PageNumber, PageSize }) => {
+    const filters = {
+        ProjectID: ProjectID || null,
+        Status: Status || null,
+        Priority: Priority || null,
+        PageNumber: PageNumber || 1,
+        PageSize: PageSize || 1000,
+    };
 
-    const queryString = queryParams.length > 0 ? '?' + queryParams.join('&') : '';
-    const url = `${process.env.API_SECRET_URL}/api/v1/tasks/filter${queryString}`;
+    const filteredParam = Object.fromEntries(
+        Object.entries(filters).filter(([, value]) => value !== null)
+    );
 
-    const res = await fetchBase(url);
+    const res = await fetchBase(
+        `${process.env.API_SECRET_URL}/api/v1/tasks/filter?` +
+        new URLSearchParams(filteredParam)
+    );
 
     return res;
-    
 };
+
 
 export const assignUserToTask = async (taskId, userId) => {
     const url = `${process.env.API_SECRET_URL}/api/v1/tasks/${taskId}/users`;  // Xây dựng URL với taskId
