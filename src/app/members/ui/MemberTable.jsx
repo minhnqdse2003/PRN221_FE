@@ -27,6 +27,7 @@ import { IoSearchOutline as SearchIcon } from "react-icons/io5";
 import { capitalize, getTodayFormatted } from "@/utils/displayUtils";
 import { FaChevronRight, FaFemale, FaMale } from "react-icons/fa";
 import AddMemberModal from "./AddMemberModal";
+import ViewMemberModal from "./ViewMemberModal";
 
 const statusColorMap = {
   approved: "success",
@@ -171,6 +172,12 @@ const MemberTable = () => {
     direction: "ascending",
   });
   const [page, setPage] = useState(1);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const {
+    isOpen: isViewModalOpen,
+    onOpen: onViewModalOpen,
+    onOpenChange: onViewModalOpenChange,
+  } = useDisclosure();
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -311,6 +318,11 @@ const MemberTable = () => {
     setFilterValue("");
     setPage(1);
   }, []);
+
+  const onDetailsTrainingProgram = (user) => {
+    setSelectedMember(user);
+    onViewModalOpen();
+  };
 
   const topContent = useMemo(() => {
     return (
@@ -475,6 +487,11 @@ const MemberTable = () => {
         </TableBody>
       </Table>
       <AddMemberModal isOpen={isOpen} onOpenChange={onOpenChange} />
+      <ViewMemberModal
+        isOpen={isViewModalOpen}
+        onOpenChange={onViewModalOpenChange}
+        selectedMember={selectedMember}
+      />
     </div>
   );
 };

@@ -4,9 +4,21 @@ export const getProjects = async () => {
   const url = `${process.env.API_SECRET_URL}/api/v1/projects`;
 
   const res = await fetchBase(url);
+  const projects = await res.json();
 
-  return res;
+  const formattedProjects = projectsResponse.data.map(project => ({
+    id: project.id,
+    name: project.name,
+    description: project.description,
+    leaderId: project['leader-id'],
+    startDate: project['start-date'],
+    endDate: project['end-date']
+  }));
+
+
+  return formattedProjects;
 };
+
 
 export const getProject = async (id) => {
   const url = `${process.env.API_SECRET_URL}/api/v1/projects/${id}`;
@@ -16,6 +28,14 @@ export const getProject = async (id) => {
   return res;
 };
 
+export const useGetProjectsForMember = (memberId) => {
+  return useQuery({
+    queryKey: ['projects'],
+    queryFn: getProjects,
+    refetchOnWindowFocus: false,
+    select: (projects) => projects.filter(project => project.members.includes(memberId)), 
+  });
+};
 
 export const createProject = async (projectData) => {
     const url = `${process.env.API_SECRET_URL}/api/v1/projects`;

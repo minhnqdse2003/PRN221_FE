@@ -19,35 +19,35 @@ const FeedbackTasks = () => {
       date: "Yesterday,6:04 PM",
     },
     {
-      name: "Project 1",
+      name: "Project 2",
       content: "Not Available",
       status: "Rejected",
       user: "Nguyen Thanh Cong",
       date: "Today,6:04 PM",
     },
     {
-      name: "Project 1",
+      name: "Project 3",
       content: "Not Available",
       status: "Accepted",
       user: "Nguyen Thanh Cong",
       date: "12-02-2024,6:04 PM",
     },
     {
-      name: "Project 1",
+      name: "Project 4",
       content: "Not Available",
       status: "Pending",
       user: "Nguyen Thanh Cong",
       date: "12-02-2024,6:04 PM",
     },
     {
-      name: "Project 1",
+      name: "Project 5",
       content: "Not Available",
       status: "Rejected",
       user: "Nguyen Thanh Cong",
       date: "12-02-2024,6:04 PM",
     },
     {
-      name: "Project 1",
+      name: "Project 6",
       content: "Not Available",
       status: "Pending",
       user: "Nguyen Thanh Cong",
@@ -67,9 +67,12 @@ const FeedbackTasks = () => {
   return (
     <div className="flex flex-col gap-4 bg-white p-6 rounded-xl">
       <p className="font-semibold text-2xl">Work Report</p>
-      <div className="grid grid-cols-3 gap-4">
-        {items.map((item, index) => (
-          <Card key={item.name}>
+      {items.length === 0 ? (
+        <div className="text-center text-gray-500">No Report Found</div>
+      ) : (
+      <div className="grid grid-cols-3 gap-4" > 
+        {items.map((item, index) => (  
+          <Card  key={item.name}>
             <CardHeader className="flex gap-3">
               <div className="flex flex-row justify-between w-full">
                 <p className="text-md text-blue-600 font-bold underline">
@@ -103,8 +106,8 @@ const FeedbackTasks = () => {
             </CardBody>
           </Card>
         ))}
+      </div> )}
       </div>
-    </div>
   );
 };
 

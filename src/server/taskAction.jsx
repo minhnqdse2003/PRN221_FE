@@ -4,9 +4,20 @@ export const getTasks = async () => {
     const url = `${process.env.API_SECRET_URL}/api/v1/tasks`;
   
     const res = await fetchBase(url);
+    const tasksResponse = await res.json
   
-    return res;
-  };
+    const formattedTasks = tasksResponse.data.map(task => ({
+        id: task.id,
+        name: task.name,
+        description: task.description,
+        dueDate: task['due-date'],
+        status: task.status,
+        priority: task.priority,
+        users: task.users.map(user => user.name), 
+        subTasks: task['sub-tasks'] 
+      }));  
+      console.log('Formatted tasks:', formattedTasks);
+      return formattedTasks};
   
   export const getTask = async (id) => {
     const url = `${process.env.API_SECRET_URL}/api/v1/tasks/${id}`;

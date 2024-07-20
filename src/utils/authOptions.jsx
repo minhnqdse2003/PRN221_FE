@@ -28,8 +28,8 @@ export const authOptions = {
         return {
           ...credentials,
           name: credentials.email,
-          accessToken: data?.value?.token,
-          role: data?.value?.role,
+          accessToken: data?.token,
+          role: data?.role,
         };
       },
     }),
@@ -49,8 +49,8 @@ export const authOptions = {
       }
 
       if (type === "oauth") {
-        user.role = data?.value?.role;
-        user.accessToken = data?.value?.token;
+        user.role = data?.role;
+        user.accessToken = data?.token
       }
 
       return true;
