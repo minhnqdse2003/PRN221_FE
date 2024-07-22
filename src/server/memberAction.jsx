@@ -1,3 +1,4 @@
+"use server"
 import { fetchBase } from "./baseAction";
 
 export const getMember = async () => {

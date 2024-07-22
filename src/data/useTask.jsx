@@ -3,7 +3,7 @@ import { getTasks,getTask, getTasksByFilter, assignUserToTask, removeUserFromTas
 export const useGetTasks = () => {
   return useQuery({
     queryKey: ["tasks"],
-    queryFn: async () => getTasks(),
+    queryFn: async () => await getTasks(),
     refetchOnWindowFocus: false,
   });
 };
@@ -11,7 +11,7 @@ export const useGetTasks = () => {
 export const useGetTask = (id) => {
   return useQuery({
     queryKey: ["task", id],
-    queryFn: async () => getTask(id),
+    queryFn: async () => await getTask(id),
     refetchOnWindowFocus: false,
   });
 };
@@ -19,22 +19,22 @@ export const useGetTask = (id) => {
 export const useGetTasksByFilter = (filters) => {
   return useQuery({
     queryKey: ["tasks", filters],
-    queryFn: async () => getTasksByFilter(filters),
+    queryFn: async () => await getTasksByFilter(filters),
     refetchOnWindowFocus: false,
   });
 };
 
-export const useAssignUserToTask = (taskId, onClose) => {
-  const queryClient = useQueryClient();
+// export const useAssignUserToTask = (taskId, onClose) => {
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (userId) => await assignUserToTask(taskId, userId),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["task", taskId]);
-      onClose();
-    },
-  });
-};
+//   return useMutation({
+//     mutationFn: async (userId) => await assignUserToTask(taskId, userId),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries(["task", taskId]);
+//       onClose();
+//     },
+//   });
+// };
 
 export const useRemoveUserFromTask = (taskId, onClose) => {
   const queryClient = useQueryClient();

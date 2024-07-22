@@ -1,10 +1,10 @@
-import { getProject, getProjects } from "@/server/projectAction";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { postProjectMemberPosition, updateProject, getProject, getProjects, createProject, removeMemberFromProject, removeProject } from "@/server/projectAction";
 
 export const useGetProjects = () => {
   return useQuery({
     refetchOnWindowFocus: false,
-    queryFn: async () => getProjects(),
+    queryFn: async () => await getProjects(),
     queryKey: ["projects"],
   });
 };
@@ -12,7 +12,7 @@ export const useGetProjects = () => {
 export const useGetProject = (id) => {
   return useQuery({
     refetchOnWindowFocus: false,
-    queryFn: async () => getProject(id),
+    queryFn: async () => await getProject(id),
     queryKey: ["project", id],
   });
 };
@@ -26,6 +26,9 @@ export const useCreateProject = (onClose) => {
       queryClient.invalidateQueries(["projects"]);
       onClose();
     },
+    onError: (error) => {
+      console.error("Error creating project:", error);
+    },
   });
 };
 
@@ -37,6 +40,9 @@ export const useRemoveProject = (onClose) => {
     onSuccess: () => {
       queryClient.invalidateQueries(["projects"]);
       onClose();
+    },
+    onError: (error) => {
+      console.error("Error removing project:", error);
     },
   });
 };
@@ -51,6 +57,9 @@ export const useUpdateProject = (onClose) => {
       queryClient.invalidateQueries(["projects"]);
       onClose();
     },
+    onError: (error) => {
+      console.error("Error updating project:", error);
+    },
   });
 };
 
@@ -59,17 +68,23 @@ export const useGetProjectMembers = (projectId) => {
     queryKey: ["projectMembers", projectId],
     queryFn: async () => getProjectMembers(projectId),
     refetchOnWindowFocus: false,
+    onError: (error) => {
+      console.error("Error fetching project members:", error);
+    },
   });
 };
 
-export const usePostProjectMemberPosition = (projectId, onClose) => {
+export const usePostProjectMemberPosition = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (userData) => await postProjectMemberPosition(projectId, userData),
+    mutationKey: "postProjectMemberPosition",
+    mutationFn: async ({ projectId, userData }) => await postProjectMemberPosition(projectId, userData),
     onSuccess: () => {
       queryClient.invalidateQueries(["projectMembers", projectId]);
-      onClose();
+    },
+    onError: (error) => {
+      console.error("Error adding project member:", error);
     },
   });
 };
@@ -83,17 +98,23 @@ export const usePutProjectMemberPosition = (projectId, onClose) => {
       queryClient.invalidateQueries(["projectMembers", projectId]);
       onClose();
     },
+    onError: (error) => {
+      console.error("Error updating project member position:", error);
+    },
   });
 };
 
-export const useRemoveMemberFromProject = (projectId, onClose) => {
+export const useRemoveMemberFromProject = (projectId) => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: "removeMemberFromProject",
     mutationFn: async (userId) => await removeMemberFromProject(projectId, userId),
     onSuccess: () => {
       queryClient.invalidateQueries(["projectMembers", projectId]);
-      onClose();
+    },
+    onError: (error) => {
+      console.error("Error removing project member:", error);
     },
   });
 };

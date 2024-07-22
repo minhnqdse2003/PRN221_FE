@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Tabs, Tab, Card, CardBody } from "@nextui-org/react";
 import { FaTasks } from "react-icons/fa";
 import { RiTeamLine } from "react-icons/ri";
@@ -8,7 +8,8 @@ import TaskTab from "./TaskTab";
 import TeamTab from "./TeamTab";
 import ReportsTab from "./ReportsTab";
 
-const ProjectTask = () => {
+const ProjectTask = ({ selectedProject }) => {
+  console.log("ProjectTask", selectedProject);
   const [selected, setSelected] = useState("tasks");
 
   return (
@@ -32,7 +33,7 @@ const ProjectTask = () => {
           </div>
         }
       >
-        <TaskTab />
+          <TaskTab project={selectedProject}/>
       </Tab>
       <Tab
         key="team"
@@ -43,7 +44,7 @@ const ProjectTask = () => {
           </div>
         }
       >
-        <TeamTab />
+        <TeamTab selectedProject={selectedProject} />
       </Tab>
       <Tab
         key="reports"
@@ -54,7 +55,7 @@ const ProjectTask = () => {
           </div>
         }
       >
-        <ReportsTab />
+        <ReportsTab selectedProject={selectedProject} />
       </Tab>
     </Tabs>
   );

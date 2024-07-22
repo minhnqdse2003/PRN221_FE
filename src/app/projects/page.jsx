@@ -9,7 +9,7 @@ import { authOptions } from "@/utils/authOptions";
 const page = async () => {
   const session = await getServerSession(authOptions);
 
-  if (session && session?.user.role !== "Intern") {
+  if (session && session?.user.role == "Intern") {
     redirect(404);
   }
   return (

@@ -143,19 +143,7 @@ const users = [
 const RecentIntern = () => {
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 4;
-  const filters = {
-    ProjectID: projectId,
-    Status: status,
-    Priority: priority,
-    PageNumber: pageNumber,
-    PageSize: pageSize,
-  };
-  
-  const { data: tasks, isLoading, error } = useGetTasksByFilter(filters);
-  
-  if (isLoading) return <div>Task is Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
+    
   const pages = Math.ceil(users.length / rowsPerPage);
 
   const Tasks = React.useMemo(() => {
