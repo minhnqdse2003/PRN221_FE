@@ -27,7 +27,7 @@ const TaskModalEdit = (props) => {
   const { data: projectDetails, isLoading, error } = useGetProject(projectId);
   const { mutate: updateTask } = useUpdateTask(onOpenChange);
   const { mutate: assignUsersToTask } = useAssignUsersToTask(null, onOpenChange);
-  const [selectedUsers, setSelectedUsers] = useState(new Set());
+  const [selectedUsers, setSelectedUsers] = useState("");
   const [selected, setSelected] = useState("today");
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
@@ -38,8 +38,7 @@ const TaskModalEdit = (props) => {
     if (task) {
       setTaskTitle(task.name);
       setPriority(task.priority);
-      setSelectedUsers(new Set(task.users?.map(user => user.id)));
-    }
+      setSelectedUsers(task.users?.[0]?.id || "");     }
   }, [task]);
 
   useEffect(() => {
@@ -61,7 +60,6 @@ const TaskModalEdit = (props) => {
         : selected === "tomorrow"
           ? endOfDay(addDays(new Date(), 1))
           : endOfDay(addDays(new Date(), 7));
-
     const taskData = {
       id: task.id,
       name: taskTitle ?? task.title,
@@ -69,22 +67,17 @@ const TaskModalEdit = (props) => {
       status: task.status,
       priority: priority ?? task.priority,
     };
+    const assignTask = {
 
-    updateTask(taskData, {
+    }
+
+    updateTask(taskData, { 
       onSuccess: () => {
-        const userIds = Array.from(selectedUsers);
-  
-        Promise.all(
-          userIds.map(userId =>
-            assignUsersToTask({ taskId: task.id, userId })
-          )
-        ).then(() => {
-          toast.success("Task updated and users assigned successfully");
-          onOpenChange(false);
-        }).catch((error) => {
-          toast.error("Failed to assign users to task");
-        });
-  
+        assignUsersToTask({ taskId: task.id, userId: selectedUsers } , {
+          onSuccess: () =>{
+            toast.success("Assign user to tast successfully")
+          }
+        })
         toast.success("Task updated successfully");
       },
       onError: (error) => {
@@ -123,7 +116,7 @@ const TaskModalEdit = (props) => {
                   items={projectDetails?.users || []}
                   label="Assigned to"
                   variant="bordered"
-                  selectionMode="multiple"
+                  selectionMode="single"
                   placeholder="Select a user"
                   labelPlacement="outside"
                   classNames={{

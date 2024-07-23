@@ -24,21 +24,23 @@ export const useGetTasksByFilter = (filters) => {
   });
 };
 
-export const useAssignUsersToTask = (taskId, onClose) => {
+export const useAssignUsersToTask = (onClose) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationKey: "assignUsersToTask",
-    mutationFn: async ( taskId, userIds) => await assignUsersToTask(taskId, userIds),
+    mutationFn: async ({ taskId, userId }) => await assignUsersToTask(taskId, userId),
     onSuccess: () => {
-      queryClient.invalidateQueries(["task", taskId]);
+      queryClient.invalidateQueries(["task"]);
       onClose();
     },
     onError: (error) => {
-      console.error("Error assigning users to task:", error);
+      console.error("Error assigning user to task:", error);
+      toast.error("Failed to assign user to task");
     },
   });
 };
+
 
 export const useRemoveUserFromTask = (taskId, onClose) => {
   const queryClient = useQueryClient();

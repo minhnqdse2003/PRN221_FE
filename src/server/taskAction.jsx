@@ -64,21 +64,22 @@ export const getTasks = async (status = "") => {
 };
 
 
-export const assignUsersToTask = async (taskId, userIds) => {
-    const url = `${process.env.API_SECRET_URL}/api/v1/tasks/${taskId}/users`;
-  
-    for (const userId of userIds) {
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ "user-id": userId }),
-      };
-      const res = await fetchBase(url, options);
-      return res;
-    }
+export const assignUsersToTask = async (taskId, userId) => {
+  const url = `${process.env.API_SECRET_URL}/api/v1/tasks/${taskId}/users`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ "user-id": userId }),
   };
+  const res = await fetchBase(url, options);
+  if (!res.ok) {
+    throw new Error(`Failed to assign user ${userId} to task ${taskId}`);
+  }
+  return res;
+};
+
 export const removeUserFromTask = async (taskId, userId) => {
     const url = `${process.env.API_SECRET_URL}/api/v1/tasks/${taskId}/users`;
     const options = {
