@@ -5,16 +5,22 @@ import {
   createTrainingProgram,
   updateTrainingProgram,
   removeTrainingProgram,
-  getLessonsFromTrainingProgram,
-  postTrainingProgramMember,
-  putTrainingProgramMemberPosition,
-  removeMemberFromTrainingProgram,
-} from "./trainingProgramAction";
+  putLesson,
+  // getLessonsFromTrainingProgram,
+  // postTrainingProgramMember,
+  // putTrainingProgramMemberPosition,
+  // removeMemberFromTrainingProgram,
+} from "@/server/trainingProgramAction";
+import {
+  getJoinedTrainingProgram,
+  postJoinedTrainingProgram,
+} from "@/server/userTrainingAction";
+import { removeLesson } from "@/server/lessonAction";
 
 export const useGetTrainingPrograms = () => {
   return useQuery({
     refetchOnWindowFocus: false,
-    queryFn: async () => getTrainingPrograms(),
+    queryFn: async () => await getTrainingPrograms(),
     queryKey: ["trainingprograms"],
   });
 };
@@ -63,6 +69,25 @@ export const useRemoveTrainingProgram = (onSuccess) => {
   });
 };
 
+export const useGetJoinedTrainingProgram = () => {
+  return useQuery({
+    refetchOnWindowFocus: false,
+    queryFn: async () => await getJoinedTrainingProgram(),
+    queryKey: ["joined-trainingprograms"],
+  });
+};
+
+export const usePostJoinedTrainingProgram = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data) => await postJoinedTrainingProgram(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["joined-trainingprograms"]);
+    },
+  });
+};
+
 export const useGetLessonsFromTrainingProgram = (id) => {
   return useQuery({
     refetchOnWindowFocus: false,
@@ -75,10 +100,33 @@ export const usePostTrainingProgramMember = (onSuccess) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ programId, data }) => await postTrainingProgramMember(programId, data),
+    mutationFn: async ({ programId, data }) =>
+      await postTrainingProgramMember(programId, data),
     onSuccess: () => {
       queryClient.invalidateQueries(["trainingprograms"]);
       if (onSuccess) onSuccess();
+    },
+  });
+};
+
+export const usePutLesson = (id) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data) => await putLesson(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["trainingprogram", id]);
+    },
+  });
+};
+
+export const useDeleteLesson = (id) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (ids) => await removeLesson(ids),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["trainingprogram", id]);
     },
   });
 };
@@ -87,7 +135,8 @@ export const usePutTrainingProgramMemberPosition = (onSuccess) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ programId, data }) => await putTrainingProgramMemberPosition(programId, data),
+    mutationFn: async ({ programId, data }) =>
+      await putTrainingProgramMemberPosition(programId, data),
     onSuccess: () => {
       queryClient.invalidateQueries(["trainingprograms"]);
       if (onSuccess) onSuccess();
@@ -95,12 +144,12 @@ export const usePutTrainingProgramMemberPosition = (onSuccess) => {
   });
 };
 
-
 export const useRemoveMemberFromTrainingProgram = (onSuccess) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ programId, userId }) => await removeMemberFromTrainingProgram(programId, userId),
+    mutationFn: async ({ programId, userId }) =>
+      await removeMemberFromTrainingProgram(programId, userId),
     onSuccess: () => {
       queryClient.invalidateQueries(["trainingprograms"]);
       if (onSuccess) onSuccess();

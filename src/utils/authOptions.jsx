@@ -50,7 +50,7 @@ export const authOptions = {
 
       if (type === "oauth") {
         user.role = data?.role;
-        user.accessToken = data?.token
+        user.accessToken = data?.token;
       }
 
       return true;

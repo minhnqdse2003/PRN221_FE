@@ -16,6 +16,7 @@ import {
   Chip,
   Pagination,
   Avatar,
+  useDisclosure,
 } from "@nextui-org/react";
 import {
   IoMdAdd as PlusIcon,
@@ -25,10 +26,13 @@ import { IoSearchOutline as SearchIcon } from "react-icons/io5";
 import { capitalize } from "@/utils/displayUtils";
 import { FaChevronRight } from "react-icons/fa";
 import { permanentRedirect, redirect, useRouter } from "next/navigation";
+import { useGetTrainingPrograms } from "@/data/useTrainingPrograms";
+import AddTrainingProgram from "./AddTrainingProgram";
+import { useSession } from "next-auth/react";
 const statusColorMap = {
-  easy: "success",
-  medium: "warning",
-  hard: "danger",
+  Easy: "success",
+  Medium: "warning",
+  Hard: "danger",
 };
 
 const columns = [
@@ -42,69 +46,18 @@ const columns = [
 ];
 
 const statusOptions = [
-  { name: "Easy", uid: "easy" },
-  { name: "Medium", uid: "medium" },
-  { name: "Hard", uid: "hard" },
-];
-
-const trainingPrograms = [
-  {
-    id: 1,
-    title: "AWS For Beginner",
-    description:
-      "This course belong to whose was wanted to join in training program",
-    duration: "24 hours",
-    level: "easy",
-    user: ["Nguyen Tran My Anh", "Tran Le Anh Thu", "Nguyen Duc Manh"],
-  },
-  {
-    id: 2,
-    title: "Introduction to Cloud Computing",
-    description:
-      "This course provides a foundational understanding of cloud concepts and services.",
-    duration: "8 hours",
-    level: "easy",
-    user: ["Le Thi Hong Nhung", "Pham Minh Hien", "Dao Quang Huy"],
-  },
-  {
-    id: 3,
-    title: "Building Serverless Applications on AWS",
-    description:
-      "Learn how to design and deploy serverless applications using AWS Lambda and API Gateway.",
-    duration: "16 hours",
-    level: "medium",
-    user: ["Tran Quoc Viet", "Nguyen Thi My Chau", "Cao Minh Tri"],
-  },
-  {
-    id: 4,
-    title: "Securing Your Cloud Infrastructure on AWS",
-    description:
-      "Gain insights into implementing best practices for securing your AWS resources.",
-    duration: "20 hours",
-    level: "hard",
-    user: ["Le Van Nam", "Nguyen Thi Phuong Thao", "Pham Xuan Dung"],
-  },
-  {
-    id: 5,
-    title: "Designing Databases for Scalability on AWS",
-    description:
-      "Explore strategies for designing and optimizing databases for high availability and performance in the cloud.",
-    duration: "12 hours",
-    level: "medium",
-    user: ["Tran Ngoc Anh", "Nguyen Huu Dat", "Cao Thi Thu Trang"],
-  },
-  {
-    id: 6,
-    title: "Deploying Containers on AWS ECS",
-    description:
-      "Learn how to leverage Amazon Elastic Container Service (ECS) for container orchestration.",
-    duration: "18 hours",
-    level: "medium",
-    user: ["Le Minh Quang", "Nguyen Thi Hong Nhung", "Pham Xuan Nam"],
-  },
+  { name: "Easy", uid: "Easy" },
+  { name: "Medium", uid: "Medium" },
+  { name: "Hard", uid: "Hard" },
 ];
 
 const TrainingProgramTable = () => {
+  const { data } = useGetTrainingPrograms();
+  const session = useSession();
+
+  const trainingPrograms = data?.data || [];
+  const isManager = session.data.user.role === "Training Manager";
+
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
   const [statusFilter, setStatusFilter] = useState("all");
@@ -113,6 +66,7 @@ const TrainingProgramTable = () => {
     column: "age",
     direction: "ascending",
   });
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const router = useRouter();
   const [page, setPage] = useState(1);
 
@@ -175,12 +129,12 @@ const TrainingProgramTable = () => {
       case "user":
         return (
           <div className="flex -space-x-3 rtl:space-x-reverse">
-            {program.user.length > 0
-              ? program.user.map((item) => (
+            {program.users?.length > 0
+              ? program.users.map((item) => (
                   <Avatar
-                    name={item}
+                    name={item.name}
                     size="sm"
-                    key={item}
+                    key={item.name}
                     getInitials={(name) => name.charAt(0)}
                   />
                 ))
@@ -271,9 +225,15 @@ const TrainingProgramTable = () => {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<PlusIcon />}>
-              Add New
-            </Button>
+            {isManager && (
+              <Button
+                onPress={onOpen}
+                color="primary"
+                endContent={<PlusIcon />}
+              >
+                Add New
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -326,45 +286,51 @@ const TrainingProgramTable = () => {
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   return (
-    <Table
-      aria-label="Example table with custom cells, pagination and sorting"
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      classNames={{
-        wrapper: "max-h-[382px]",
-      }}
-      selectedKeys={selectedKeys}
-      selectionMode="single"
-      sortDescriptor={sortDescriptor}
-      topContent={topContent}
-      topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
-      onSortChange={setSortDescriptor}
-    >
-      <TableHeader columns={columns}>
-        {(column) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody emptyContent={"No Training Program Found"} items={sortedItems}>
-        {(item) => (
-          <TableRow
-            key={item.id}
-            onClick={() => onDetailsTrainingProgram(item)}
-          >
-            {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <div>
+      <Table
+        aria-label="Example table with custom cells, pagination and sorting"
+        bottomContent={bottomContent}
+        bottomContentPlacement="outside"
+        classNames={{
+          wrapper: "max-h-[382px]",
+        }}
+        selectedKeys={selectedKeys}
+        selectionMode="single"
+        sortDescriptor={sortDescriptor}
+        topContent={topContent}
+        topContentPlacement="outside"
+        onSelectionChange={setSelectedKeys}
+        onSortChange={setSortDescriptor}
+      >
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === "actions" ? "center" : "start"}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody
+          emptyContent={"No Training Program Found"}
+          items={sortedItems}
+        >
+          {(item) => (
+            <TableRow
+              key={item.id}
+              onClick={() => onDetailsTrainingProgram(item)}
+            >
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <AddTrainingProgram isOpen={isOpen} onOpenChange={onOpenChange} />
+    </div>
   );
 };
 

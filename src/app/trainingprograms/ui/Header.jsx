@@ -8,8 +8,7 @@ const Header = () => {
       <div className="flex flex-row p-6 items-center gap-4">
         <FaBook size={24} />
         <span className="flex flex-row">
-          <p className="font-semibold text-sm">Training Program / </p>
-          <p className="text-sm">Project 2</p>
+          <p className="font-semibold text-sm">Training Program</p>
         </span>
       </div>
       <Divider />

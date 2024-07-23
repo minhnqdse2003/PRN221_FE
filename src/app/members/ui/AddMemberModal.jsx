@@ -1,3 +1,4 @@
+"use client";
 import { addMemberSchema } from "@/schemas/memberAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseDate } from "@internationalized/date";
@@ -14,7 +15,7 @@ import {
   SelectItem,
   Select,
 } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { BsFillMortarboardFill } from "react-icons/bs";
 import { FaChalkboardTeacher, FaPhone } from "react-icons/fa";
@@ -23,8 +24,16 @@ import { LiaUserTagSolid } from "react-icons/lia";
 import { MdOutlineMail, MdSubtitles } from "react-icons/md";
 import { PiExamFill, PiStudentFill } from "react-icons/pi";
 import { GrUserManager } from "react-icons/gr";
+import { useAddMember, usePutMembers } from "@/data/useMembers";
+import Toast from "@/components/Toast";
 
-const AddMemberModal = ({ isOpen, onOpenChange }) => {
+const AddMemberModal = ({
+  isOpen,
+  onOpenChange,
+  selectedRow,
+  resetField,
+  setSelectedRow,
+}) => {
   const {
     register,
     handleSubmit,
@@ -34,7 +43,7 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
     resolver: zodResolver(addMemberSchema),
   });
 
-  const [initialFormValue, setInitialFormValue] = useState({
+  let intialValue = {
     name: "",
     email: "",
     gpa: 0.0,
@@ -47,12 +56,47 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
     dob: parseDate("2024-12-24"),
     status: true,
     role: "Manager",
-  });
+  };
 
-  const onValueChange = (e) => {
+  const [initialFormValue, setInitialFormValue] = useState(intialValue);
+
+  const processForm = async (data) => {
+    const date = new Date(initialFormValue.dob.toString());
+    const formData = {
+      email: data.email,
+      name: data.name,
+      role: data.role,
+      "date-of-birth": date.toISOString(),
+      "is-male": initialFormValue.gender,
+      phone: data.phone,
+      address: data.address,
+      gpa: Number(data.gpa),
+      "link-cv": data["link-cv"],
+      major: data.major,
+      status: initialFormValue.status,
+      "desired-position": data["desired-position"],
+    };
+
+    if (selectedRow) mutatePut(selectedRow);
+    else mutate(formData);
+  };
+
+  const resetAllField = () => {
+    reset();
+    resetField();
     setInitialFormValue({
-      ...initialFormValue,
-      [e.target.name]: e.target.value,
+      name: "",
+      email: "",
+      gpa: 0.0,
+      address: "",
+      phone: "",
+      major: "",
+      "desired-position": "",
+      "link-cv": "",
+      gender: true,
+      dob: parseDate("2024-12-24"),
+      status: true,
+      role: "Manager",
     });
   };
 
@@ -63,7 +107,6 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
       startContent: <LiaUserTagSolid />,
       name: "name",
       value: initialFormValue.name,
-      onChange: onValueChange,
       type: "text",
     },
     {
@@ -71,8 +114,7 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
       placeholder: "Enter member email...",
       startContent: <MdOutlineMail />,
       name: "email",
-      value: initialFormValue.gpa,
-      onChange: onValueChange,
+      value: initialFormValue.email,
       type: "email",
     },
     {
@@ -81,7 +123,6 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
       startContent: <PiExamFill />,
       name: "gpa",
       value: initialFormValue.gpa,
-      onChange: onValueChange,
       type: "text",
     },
     {
@@ -90,7 +131,6 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
       startContent: <FaLocationCrosshairs />,
       name: "address",
       value: initialFormValue.address,
-      onChange: onValueChange,
       type: "text",
     },
     {
@@ -99,7 +139,6 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
       startContent: <FaPhone />,
       name: "phone",
       value: initialFormValue.phone,
-      onChange: onValueChange,
       type: "text",
     },
     {
@@ -108,7 +147,6 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
       startContent: <BsFillMortarboardFill />,
       name: "major",
       value: initialFormValue.major,
-      onChange: onValueChange,
       type: "text",
     },
     {
@@ -117,7 +155,6 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
       startContent: <BsFillMortarboardFill />,
       name: "desired-position",
       value: initialFormValue["desired-position"],
-      onChange: onValueChange,
       type: "text",
     },
     {
@@ -126,21 +163,37 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
       startContent: <MdSubtitles />,
       name: "link-cv",
       value: initialFormValue["link-cv"],
-      onChange: onValueChange,
       type: "text",
     },
   ];
+
+  const handleOnClose = () => {
+    isOpen = !isOpen;
+  };
+
+  const handleOnValueChange = (e, name) => {
+    if (selectedRow) {
+      setSelectedRow({ ...selectedRow, [name]: e });
+    } else setInitialFormValue({ ...initialFormValue, [name]: e });
+  };
+
+  const { mutate, error: serverError } = useAddMember(handleOnClose);
+
+  const { mutate: mutatePut, error: putError } = usePutMembers(handleOnClose);
 
   return (
     <Modal
       backdrop="opaque"
       isOpen={isOpen}
-      onOpenChange={onOpenChange}
+      onOpenChange={() => {
+        onOpenChange();
+        resetAllField();
+      }}
       radius="md"
     >
       <ModalContent>
         {(onClose) => (
-          <>
+          <form onSubmit={handleSubmit(processForm)}>
             <ModalHeader className="flex flex-col gap-1">
               Add Member
             </ModalHeader>
@@ -153,7 +206,12 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
                     placeholder={param.placeholder}
                     startContent={param.startContent}
                     name={param.name}
-                    onChange={param.onChange}
+                    value={
+                      selectedRow
+                        ? selectedRow[param.name]
+                        : initialFormValue[param.name]
+                    }
+                    onValueChange={(e) => handleOnValueChange(e, param.name)}
                     {...register(param.name)}
                     type={param.type}
                   />
@@ -183,17 +241,29 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
                   onValueChange={(value) =>
                     setInitialFormValue({ ...initialFormValue, gender: value })
                   }
+                  {...register("gender")}
                 >
                   {initialFormValue.gender ? "Male" : "Female"}
                 </Switch>
+                {error["gender"]?.message && (
+                  <p className="text-sm text-red-400">
+                    {error["gender"].message}
+                  </p>
+                )}
                 <Switch
                   isSelected={initialFormValue.status}
                   onValueChange={(value) =>
                     setInitialFormValue({ ...initialFormValue, status: value })
                   }
+                  {...register("status")}
                 >
                   {initialFormValue.status ? "Active" : "InActive"}
                 </Switch>
+                {error["status"]?.message && (
+                  <p className="text-sm text-red-400">
+                    {error["status"].message}
+                  </p>
+                )}
               </div>
               <Select
                 className="w-full"
@@ -206,7 +276,7 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
                   })
                 }
                 placeholder="Select Role..."
-                
+                {...register("role")}
               >
                 <SelectItem key="Manager" startContent={<GrUserManager />}>
                   Manager
@@ -218,18 +288,42 @@ const AddMemberModal = ({ isOpen, onOpenChange }) => {
                   Mentor
                 </SelectItem>
               </Select>
+              {error["role"]?.message && (
+                <p className="text-sm text-red-400">{error["role"].message}</p>
+              )}
             </ModalBody>
             <ModalFooter>
-              <Button color="foreground" variant="light" onPress={onClose}>
+              <Button
+                color="foreground"
+                variant="light"
+                type="button"
+                onPress={() => {
+                  onClose();
+                  resetAllField();
+                }}
+                auto
+              >
                 Close
               </Button>
-              <Button className="bg-btn text-white" onPress={onClose}>
-                Add
-              </Button>
+              {selectedRow ? (
+                <Button className="bg-btn text-white" type="submit" auto>
+                  Update
+                </Button>
+              ) : (
+                <Button className="bg-btn text-white" type="submit" auto>
+                  Add
+                </Button>
+              )}
             </ModalFooter>
-          </>
+          </form>
         )}
       </ModalContent>
+
+      <Toast
+        open={!!serverError}
+        message={serverError?.message}
+        severity={"error"}
+      />
     </Modal>
   );
 };

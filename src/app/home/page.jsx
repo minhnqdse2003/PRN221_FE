@@ -44,14 +44,15 @@ const page = async () => {
   //   redirect("/login");
   // }
   if (session) {
-  return (
-    <main className="h-[100vh] w-full overflow-y-scroll p-8">
-      {/* <HrPage /> */}
-      <InternPage />
-    </main>
-  );}else {
-      redirect("/login");
-    }
-}
+    return (
+      <main className="h-[100vh] w-full overflow-y-scroll p-8">
+        {/* <HrPage /> */}
+        <InternPage />
+      </main>
+    );
+  } else {
+    redirect("/login");
+  }
+};
 
 export default page;
