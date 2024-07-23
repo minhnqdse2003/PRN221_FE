@@ -5,6 +5,7 @@ export const useCreateSubTask = (onClose) => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: 'createSubTask',
     mutationFn: async (taskData) => await createSubTask(taskData),
     onSuccess: () => {
       queryClient.invalidateQueries(["subtasks"]);
@@ -25,14 +26,14 @@ export const useUpdateSubTask = (onClose) => {
   });
 };
 
-export const useDeleteSubTask = (onClose) => {
+export const useDeleteSubTask = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: 'deleteSubTask',
     mutationFn: async (id) => await deleteSubTask(id),
     onSuccess: () => {
       queryClient.invalidateQueries(["subtasks"]);
-      onClose();
     },
   });
 };

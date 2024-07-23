@@ -6,7 +6,7 @@ import { getTodayFormatted } from "@/utils/displayUtils";
 import TaskModalAdd from "./TaskModalAdd";
 import CreateSubTaskModal from "./SubTaskModelAdd";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import { useCreateSubTask } from "@/data/useSubTask";
+import { useCreateSubTask, useDeleteSubTask } from "@/data/useSubTask";
 import {
   Card,
   CardBody,
@@ -24,16 +24,26 @@ import {
   Chip,
 } from "@nextui-org/react";
 import { useGetProject } from "@/data/useProjects";
+import {useDeleteTask, useUpdateTask} from "@/data/useTask";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import TaskModalEdit from "./TaskModalEdit";
 
 const TaskTab = ({ project }) => {
   const [filterTask, setFilterTask] = useState("My Task");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen: isEditModalOpen, onOpen: onOpenEditModal, onOpenChange: onEditModalOpenChange } = useDisclosure();
   const [projectTask, setProjectTask] = useState([]);
   const [isSubTaskModalOpen, setSubTaskModalOpen] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState(null);
+  const [currentTask, setCurrentTask] = useState(null);
   const { data: projectDetails, isLoading, error } = useGetProject(project.id);
-  console.log("ProjectDetails:", projectDetails);
   const { mutate: createSubTask } = useCreateSubTask();
+  const { mutate: deleteTask } = useDeleteTask();
+  const { mutate: deleteSubTask } = useDeleteSubTask();
+  const { mutate: updateTask } = useUpdateTask();
+
+
 
   useEffect(() => {
     if (projectDetails) {
@@ -45,11 +55,23 @@ const TaskTab = ({ project }) => {
   if (error) return <div>Error loading project tasks</div>;
 
   const onClickFilter = (e) => {
-    console.log(e);
   };
 
-  const onChangeStatus = (item) => {
-    console.log(item);
+  const onChangeStatus = (task) => {
+    const newStatus = task.status === 'Done' ? 'On Processing' : 'Done';
+    const taskData = {
+      id: task.id,
+      name: task.name,
+      description: task.description, 
+      status: newStatus,
+      priority: task.priority,
+    };
+
+    updateTask(taskData,{
+      onSuccess : (data ) => (
+        toast.success("Task has been update!")
+      ),
+    })
   };
 
   const onAddedSubTask = (taskId) => {
@@ -60,11 +82,29 @@ const TaskTab = ({ project }) => {
   const handleAddSubTask = (subTaskData) => {
     createSubTask(subTaskData, {
       onSuccess: () => {
-        // Handle success scenario
+        toast.success("Task has been created! ");
       },
     });
   };
-
+  const handleEditTask = (task) => {
+    setCurrentTask(task); 
+    onOpenEditModal(); 
+  }
+  const handleDeleteTask = (taskId) => {
+    deleteTask(taskId, {
+      onSuccess: (data) => {
+        toast.success("Task has been deleted ");
+        setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+      },
+    });
+  };
+  const handleDeleteSubTask = (subId) => {
+    deleteSubTask(subId, {
+      onSuccess: (data) => {
+        toast.success("Sub Task has been deleted ");
+      },
+    });
+  };
   return (
     <Card shadow="none">
       <CardHeader className="flex flex-row justify-between items-center">
@@ -96,6 +136,7 @@ const TaskTab = ({ project }) => {
           isOpen={isOpen}
           onOpen={onOpen}
           onOpenChange={onOpenChange}
+          projectId={project.id}
         />
         <CreateSubTaskModal
           isOpen={isSubTaskModalOpen}
@@ -103,6 +144,8 @@ const TaskTab = ({ project }) => {
           taskId={currentTaskId}
           onCreateSubTask={handleAddSubTask}
         />
+        <TaskModalEdit isOpen={isEditModalOpen} onOpenChange={onEditModalOpenChange} projectId={project.id} task={currentTask} />
+
       </CardHeader>
       <CardBody>
         <Accordion defaultExpandedKeys={["1"]}>
@@ -137,7 +180,7 @@ const TaskTab = ({ project }) => {
                         key={task.id}
                       >
                         <Checkbox
-                          defaultSelected={task.status}
+                          defaultSelected={task.status === "Done"}
                           onValueChange={() => onChangeStatus(task)}
                           lineThrough
                           title={task.name}
@@ -155,10 +198,10 @@ const TaskTab = ({ project }) => {
                         <div className="flex -space-x-3 rtl:space-x-reverse">
                           {task.users?.map((user) => (
                             <Avatar
-                              name={user}
+                              name={user.name}
                               size="sm"
                               key={user}
-                              getInitials={(name) => name.charAt(0)}
+                              getInitials={(name) => name.charAt(0)}z
                             />
                           ))}
                         </div>
@@ -177,8 +220,8 @@ const TaskTab = ({ project }) => {
                               </Button>
                             </DropdownTrigger>
                             <DropdownMenu>
-                              <DropdownItem>Edit</DropdownItem>
-                              <DropdownItem>Delete</DropdownItem>
+                              <DropdownItem onClick={() =>handleEditTask(task) }>Edit</DropdownItem>
+                              <DropdownItem onClick={() => handleDeleteTask(task.id)} >Delete</DropdownItem>
                             </DropdownMenu>
                           </Dropdown>
                         </div>
@@ -191,7 +234,7 @@ const TaskTab = ({ project }) => {
                         key={sub.id}
                       >
                         <Checkbox
-                          defaultSelected={sub.status}
+                          defaultSelected={sub.status=='Done'}
                           lineThrough
                           title={sub.name}
                           onClick={() => onChangeStatus(sub)}
@@ -223,8 +266,8 @@ const TaskTab = ({ project }) => {
                             </Button>
                           </DropdownTrigger>
                           <DropdownMenu>
-                            <DropdownItem>Edit</DropdownItem>
-                            <DropdownItem>Delete</DropdownItem>
+                            <DropdownItem >Edit</DropdownItem>
+                            <DropdownItem onClick={() => handleDeleteSubTask(sub.id)}  >Delete</DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </div>

@@ -12,19 +12,27 @@ import {
   Avatar,
 } from "@nextui-org/react";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const TeamModalAdd = (props) => {
   const { isOpen, onOpenChange, onAddMember } = props;
   const { data: members, isLoading, error } = useGetMembers();
   const [selectedUser, setSelectedUser] = useState(null);
   const [position, setPosition] = useState("");
+  const [selectedRole, setSelectedRole] = useState('');
+
+  const roles = ['BE', 'FE', 'Tester'];
 
   const handleAdd = () => {
-    console.log("User: ", selectedUser);
-    if (selectedUser) {
-      onAddMember({ "user-id": selectedUser.id, position });
-      onOpenChange(false);
-    }
+      onAddMember({ "user-id": selectedUser.id, position }, {
+        onSuccess: (user) => {
+          toast.success("User"+ user.mail +"added successfully");
+        },
+        onError: (error) => {
+          toast.error(`Error adding user: ${error.message}`);
+        },
+      }
+      );
   };
 
   return (
@@ -47,7 +55,6 @@ const TeamModalAdd = (props) => {
                 onSelectionChange={(key) => {
                   const user = members.data.find((member) => member.id === key);
                   setSelectedUser(user);
-                  console.log("Selected User: ", user);
                 }}
               >
                 {(user) => (

@@ -7,9 +7,10 @@ import { TbReport } from "react-icons/tb";
 import TaskTab from "./TaskTab";
 import TeamTab from "./TeamTab";
 import ReportsTab from "./ReportsTab";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProjectTask = ({ selectedProject }) => {
-  console.log("ProjectTask", selectedProject);
   const [selected, setSelected] = useState("tasks");
 
   return (

@@ -51,15 +51,7 @@ const TeamTab = ({ selectedProject }) => {
     },
   });
 
-  const { mutate: addMember } = usePostProjectMemberPosition({
-    onSuccess: (user) => {
-      setUsers((prevUsers) => [...prevUsers, user]);
-      toast.success("User added successfully");
-    },
-    onError: (error) => {
-      toast.error(`Error adding user: ${error.message}`);
-    },
-  });
+  const { mutate: addMember } = usePostProjectMemberPosition();
 
   const onClickDeleteUser = (user) => {
     setCurrentUserId(user.id);
@@ -75,9 +67,10 @@ const TeamTab = ({ selectedProject }) => {
       toast.error("User is already a member of the project.");
       return;
     }
-    addMember({ projectId: selectedProject.id, userData: { "user-id": user["user-id"], position: user.position } });
-  };
+    addMember({ projectId: selectedProject.id, userData: { "user-id": user["user-id"], position: user.position }}, {
 
+    });
+  };
   const renderCell = useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
 

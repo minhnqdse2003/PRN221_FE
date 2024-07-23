@@ -15,7 +15,6 @@ export const getProject = async (id) => {
   const url = `${process.env.API_SECRET_URL}/api/v1/projects/${id}`;
 
   const res = await fetchBase(url,{method: "GET"});
-  console.log([res]);
 
 
   return res;
@@ -88,15 +87,7 @@ export const postProjectMemberPosition = async (projectId, userData) => {
   };
 
   const res = await fetchBase(url, options);
-
-  console.log(res);
-
-  if (!res.ok) {
-    console.log(res);
-    throw new Error("Failed to add member");
-  }
-
-  return res.json();
+  return res;
 };
 
 
