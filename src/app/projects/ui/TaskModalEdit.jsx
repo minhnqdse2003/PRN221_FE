@@ -72,9 +72,20 @@ const TaskModalEdit = (props) => {
 
     updateTask(taskData, {
       onSuccess: () => {
-        assignUsersToTask({ taskId: task.id, userIds: Array.from(selectedUsers) });
+        const userIds = Array.from(selectedUsers);
+  
+        Promise.all(
+          userIds.map(userId =>
+            assignUsersToTask({ taskId: task.id, userId })
+          )
+        ).then(() => {
+          toast.success("Task updated and users assigned successfully");
+          onOpenChange(false);
+        }).catch((error) => {
+          toast.error("Failed to assign users to task");
+        });
+  
         toast.success("Task updated successfully");
-        onOpenChange(false);
       },
       onError: (error) => {
         toast.error("Failed to update task");

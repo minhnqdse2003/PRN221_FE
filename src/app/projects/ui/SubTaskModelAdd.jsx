@@ -17,11 +17,13 @@ import {
   } from "@nextui-org/react";
   import React, { useState } from "react";
   import { useGetMembers } from "@/data/useMembers";
+  import { useGetProject } from "@/data/useProjects";
   
-  const CreateSubTaskModal = ({ isOpen, onOpenChange, taskId, onCreateSubTask }) => {
-    const { data: members, isLoading, error } = useGetMembers();
+  const CreateSubTaskModal = ({ isOpen, onOpenChange, taskId, onCreateSubTask, projectId }) => {
+    const { data: projectDetails, isLoading, error } = useGetProject(projectId);
     const [description, setDescription] = useState("");
     const [assignUserID, setAssignUserID] = useState(null);
+    const [selectedUsers, setSelectedUsers] = useState(new Set());
     const [selected, setSelected] = useState("today");
     const [name, setName] = useState("");
     const [dueDate, setDueDate] = useState(new Date());
@@ -31,12 +33,17 @@ import {
         "task-id": taskId,
         description: description,
         "due-date": dueDate,
-        "assign-user-id": assignUserID,
+        "assign-user-id":  Array.from(selectedUsers)[0],
         status: 'On Processing',
         name: name,
       };
       onCreateSubTask(newSubTask);
       onOpenChange(false);
+    };
+
+    const handleUserSelect = (keys) => {
+      setSelectedUsers(keys);
+      console.log(selectedUsers);
     };
   
     if (isLoading) return <div>Loading members...</div>;
@@ -67,7 +74,7 @@ import {
                   Rows={4}
                 />
                 <Select
-                  items={members?.users || []}
+                  items={projectDetails?.users || []}
                   label="Assigned to"
                   variant="bordered"
                   selectionMode="single"

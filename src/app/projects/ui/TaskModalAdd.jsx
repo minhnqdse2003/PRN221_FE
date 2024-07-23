@@ -67,16 +67,16 @@ const TaskModalAdd = (props) => {
     createTask(taskData, {
       onSuccess: (data) => {
         console.log(selectedUsers);
-        const taskId = data.id;
-        assignUsersToTask({ taskId, userIds: Array.from(selectedUsers),
-          onSuccess: () => {
-            toast.success("Task added and users assigned successfully");
-          },
-          onError: (error) => {
-            toast.error("Failed to assign users to task");
-          },
-         },                    
-      );
+        // const taskId = data.id;
+      //   assignUsersToTask({ taskId, userIds: Array.from(selectedUsers),
+      //     onSuccess: () => {
+      //       toast.success("Task added and users assigned successfully");
+      //     },
+      //     onError: (error) => {
+      //       toast.error("Failed to assign users to task");
+      //     },
+      //    },                    
+      // );
         toast.success("Task added successfully");
         onOpenChange(false);
       },
@@ -112,7 +112,7 @@ const TaskModalAdd = (props) => {
                   onChange={(e) => setDescription(e.target.value)}
                   rows={4}
                 />
-                <Select
+                {/* <Select
                   items={projectDetails?.users || []}
                   label="Assigned to"
                   variant="bordered"
@@ -153,7 +153,7 @@ const TaskModalAdd = (props) => {
                       </div>
                     </SelectItem>
                   )}
-                </Select>
+                </Select> */}
                 <RadioGroup
                   value={selected}
                   onValueChange={setSelected}

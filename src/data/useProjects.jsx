@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { postProjectMemberPosition, updateProject, getProject, getProjects, createProject, removeMemberFromProject, removeProject } from "@/server/projectAction";
+import { postProjectMemberPosition, updateProject, getProject, getProjects, createProject, removeMemberFromProject, removeProject, putProjectMemberPosition } from "@/server/projectAction";
 
 export const useGetProjects = () => {
   return useQuery({
@@ -74,14 +74,15 @@ export const useGetProjectMembers = (projectId) => {
   });
 };
 
-export const usePostProjectMemberPosition = () => {
+export const usePostProjectMemberPosition = (onclose) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationKey: "postProjectMemberPosition",
     mutationFn: async ({ projectId, userData }) => await postProjectMemberPosition(projectId, userData),
     onSuccess: () => {
-      queryClient.invalidateQueries(["projectMembers", projectId]);
+      queryClient.invalidateQueries("projectMembers");
+      onClose();
     },
     onError: (error) => {
       console.error("Error adding project member:", error);
@@ -95,11 +96,8 @@ export const usePutProjectMemberPosition = (projectId, onClose) => {
   return useMutation({
     mutationFn: async (userData) => await putProjectMemberPosition(projectId, userData),
     onSuccess: () => {
-      queryClient.invalidateQueries(["projectMembers", projectId]);
+      queryClient.invalidateQueries("projectMembers");
       onClose();
-    },
-    onError: (error) => {
-      console.error("Error updating project member position:", error);
     },
   });
 };

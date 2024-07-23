@@ -6,7 +6,7 @@ import { getTodayFormatted } from "@/utils/displayUtils";
 import TaskModalAdd from "./TaskModalAdd";
 import CreateSubTaskModal from "./SubTaskModelAdd";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import { useCreateSubTask, useDeleteSubTask } from "@/data/useSubTask";
+import { useCreateSubTask, useDeleteSubTask, useUpdateSubTask } from "@/data/useSubTask";
 import {
   Card,
   CardBody,
@@ -42,6 +42,8 @@ const TaskTab = ({ project }) => {
   const { mutate: deleteTask } = useDeleteTask();
   const { mutate: deleteSubTask } = useDeleteSubTask();
   const { mutate: updateTask } = useUpdateTask();
+  const { mutate: updateSubTask } = useUpdateSubTask();
+
 
 
 
@@ -67,12 +69,30 @@ const TaskTab = ({ project }) => {
       priority: task.priority,
     };
 
+
     updateTask(taskData,{
       onSuccess : (data ) => (
         toast.success("Task has been update!")
       ),
     })
   };
+  const onChangeSubStatus = (sub) => {
+    const newStatus = task.status === 'Done' ? 'On Processing' : 'Done';
+    const subTaskData = {
+      "task-id": sub['task-id'],
+      description: sub.description,
+      "due-date": sub['due-date'],
+      "assign-user-id": sub['assign-user-id'],
+      status: newStatus,
+      name: sub.name,
+    }
+    updateSubTask(subTaskData,{
+      onSuccess: (data) => (
+        toast.success("Sub Task has been update!")
+      )
+    })
+
+  }
 
   const onAddedSubTask = (taskId) => {
     setCurrentTaskId(taskId);
@@ -143,6 +163,7 @@ const TaskTab = ({ project }) => {
           onOpenChange={setSubTaskModalOpen}
           taskId={currentTaskId}
           onCreateSubTask={handleAddSubTask}
+          projectId={project.id}
         />
         <TaskModalEdit isOpen={isEditModalOpen} onOpenChange={onEditModalOpenChange} projectId={project.id} task={currentTask} />
 
@@ -196,20 +217,18 @@ const TaskTab = ({ project }) => {
                           Due {task["due-date"]}
                         </p>
                         <div className="flex -space-x-3 rtl:space-x-reverse">
-                          {task.users?.map((user) => (
                             <Avatar
-                              name={user.name}
+                              name={task.user}
                               size="sm"
-                              key={user}
+                              key={task.id}
                               getInitials={(name) => name.charAt(0)}z
                             />
-                          ))}
                         </div>
                         <div className="flex flex-row gap-2">
                           <Button
                             isIconOnly
                             className="bg-transparent"
-                            onClick={() => onAddedSubTask(task.id)}
+                            onClick={() => onAddedSubTask(task.id )}
                           >
                             <IoIosAdd />
                           </Button>
@@ -231,13 +250,13 @@ const TaskTab = ({ project }) => {
                     {task["sub-tasks"].map((sub, index) => (
                       <div
                         className="flex flex-row justify-between items-center px-12 mb-4"
-                        key={sub.id}
+                        key={sub.description}
                       >
                         <Checkbox
-                          defaultSelected={sub.status=='Done'}
+                          defaultSelected={sub.status==="Done"}
                           lineThrough
                           title={sub.name}
-                          onClick={() => onChangeStatus(sub)}
+                          onClick={() => onChangeSubStatus(sub)}
                           classNames={{
                             label:
                               "max-w-full flex flex-row w-full justify-between",
@@ -250,14 +269,13 @@ const TaskTab = ({ project }) => {
                           Due {sub["due-date"]}
                         </p>
                         <div className="flex -space-x-3 rtl:space-x-reverse">
-                          {sub.users?.map((user) => (
                             <Avatar
-                              name={user}
+                              name={sub['assign-user']}
                               size="sm"
-                              key={user}
+                              key={sub.id}
                               getInitials={(name) => name.charAt(0)}
                             />
-                          ))}
+                    
                         </div>
                         <Dropdown placement="bottom-end">
                           <DropdownTrigger>
