@@ -1,7 +1,18 @@
 "use client";
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Input,
+  DatePicker,
+} from "@nextui-org/react";
 import React, { useState, useEffect } from "react";
 import ProjectInformation from "./ProjectInformation";
 import ProjectTask from "./ProjectTask";
+import ProjectModalAdd from "./ProjectModalAdd"
 import { useGetProjects } from "@/data/useProjects";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -9,6 +20,8 @@ import "react-toastify/dist/ReactToastify.css";
 const ProjectSection = () => {
   const { data: projects, isLoading, error } = useGetProjects(); 
   const [selectedProject, setSelectedProject] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   useEffect(() => {
     if ( projects?.data && projects.data.length > 0) {
@@ -23,6 +36,10 @@ const ProjectSection = () => {
     const selectedId = event.target.value;
     const project = projects.data.find((proj) => proj.id === selectedId);
     setSelectedProject(project);
+  };
+
+  const handleModalOpenChange = (isOpen) => {
+    setIsModalOpen(isOpen);
   };
 
   return (
@@ -44,6 +61,9 @@ const ProjectSection = () => {
             </option>
           ))}
         </select>
+        <Button onPress={() => setIsModalOpen(true)} className="ml-2">
+          Add Project
+        </Button>
       </div>
       {selectedProject && (
         <div className="w-full flex flex-row">
@@ -55,6 +75,7 @@ const ProjectSection = () => {
           </div>
         </div>
       )}
+            <ProjectModalAdd isOpen={isModalOpen} onOpenChange={handleModalOpenChange} />
     </div>
   );
 };
