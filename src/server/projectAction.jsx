@@ -1,21 +1,33 @@
+"use server"
+
 import { fetchBase } from "./baseAction";
 
 export const getProjects = async () => {
   const url = `${process.env.API_SECRET_URL}/api/v1/projects`;
 
-  const res = await fetchBase(url);
+  const projects = await fetchBase(url,{method: "GET"});
 
-  return res;
+  return projects;
 };
+
 
 export const getProject = async (id) => {
   const url = `${process.env.API_SECRET_URL}/api/v1/projects/${id}`;
 
-  const res = await fetchBase(url);
+  const res = await fetchBase(url,{method: "GET"});
+
 
   return res;
 };
 
+export const useGetProjectsForMember = (memberId) => {
+  return useQuery({
+    queryKey: ['projects'],
+    queryFn: getProjects,
+    refetchOnWindowFocus: false,
+    select: (projects) => projects.filter(project => project.members.includes(memberId)), 
+  });
+};
 
 export const createProject = async (projectData) => {
     const url = `${process.env.API_SECRET_URL}/api/v1/projects`;
@@ -64,19 +76,21 @@ export const getProjectMemberFromProject = async (ProjectId) => {
   return res;
 };
 
-
 export const postProjectMemberPosition = async (projectId, userData) => {
-    const url = `${process.env.API_SECRET_URL}/api/v1/projects/${projectId}/users`;
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-    };
-    const res = await fetchBase(url, options);
-    return res;
+  const url = `${process.env.API_SECRET_URL}/api/v1/projects/${projectId}/users`;
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData),
+  };
+
+  const res = await fetchBase(url, options);
+  return res;
 };
+
+
 export const putProjectMemberPosition = async (projectId, userData) => {
   const url = `${process.env.API_SECRET_URL}/api/v1/projects/${projectId}/users`;
   const options = {
@@ -98,7 +112,7 @@ export const removeMemberFromProject = async (projectId, userId)=>{
     headers: {
         'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ 'user-id': userId }),
+    body: JSON.stringify(userId),
   };
 const res = await fetchBase(url, options);
 return res;

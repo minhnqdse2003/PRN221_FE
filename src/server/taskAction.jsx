@@ -1,12 +1,35 @@
+"use server"
 import { fetchBase } from "./baseAction";
 
-export const getTasks = async () => {
-    const url = `${process.env.API_SECRET_URL}/api/v1/tasks`;
-  
-    const res = await fetchBase(url);
-  
-    return res;
-  };
+export const getTasks = async (status = "") => {
+    const url = `${process.env.API_SECRET_URL}/api/v1/tasks?Status=${status}`;
+
+    try {
+        const tasksResponse = await fetchBase(url,{
+            method: "GET",
+        });
+
+        // if (!tasksResponse || !tasksResponse.data) {
+        //     throw new Error("Invalid response structure");
+        // }
+
+        // const formattedTasks = tasksResponse.data.map(task => ({
+        //     id: task.id,
+        //     name: task.name,
+        //     description: task.description,
+        //     dueDate: task['due-date'],
+        //     status: task.status,
+        //     priority: task.priority,
+        //     users: task.users.map(user => user.name),
+        //     subTasks: task['sub-tasks']
+        // }));
+
+        return tasksResponse;
+    } catch (error) {
+        console.error("Error fetching tasks: ", error);
+        throw error;
+    }
+};
   
   export const getTask = async (id) => {
     const url = `${process.env.API_SECRET_URL}/api/v1/tasks/${id}`;
@@ -30,26 +53,31 @@ export const getTasks = async () => {
         Object.entries(filters).filter(([, value]) => value !== null)
     );
 
-    const res = await fetchBase(
-        `${process.env.API_SECRET_URL}/api/v1/tasks/filter?` +
-        new URLSearchParams(filteredParam)
-    );
+    const queryString = new URLSearchParams(filteredParam).toString();
+    const url = `${process.env.API_SECRET_URL}/api/v1/tasks?${queryString}`;
+
+    const res = await fetchBase(url, {
+        method: "GET",
+    });
 
     return res;
 };
 
 
-export const assignUserToTask = async (taskId, userId) => {
-    const url = `${process.env.API_SECRET_URL}/api/v1/tasks/${taskId}/users`;  // Xây dựng URL với taskId
-    const options = {
-        method: 'POST',  
-        headers: {
-            'Content-Type': 'application/json',  
-        },
-        body: JSON.stringify({ 'user-id': userId }), 
-    };
-    const res = await fetchBase(url, options);  
-    return res;  
+export const assignUsersToTask = async (taskId, userId) => {
+  const url = `${process.env.API_SECRET_URL}/api/v1/tasks/${taskId}/users`;
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ "user-id": userId }),
+  };
+  const res = await fetchBase(url, options);
+  if (!res.ok) {
+    throw new Error(`Failed to assign user ${userId} to task ${taskId}`);
+  }
+  return res;
 };
 
 export const removeUserFromTask = async (taskId, userId) => {
@@ -68,18 +96,18 @@ export const removeUserFromTask = async (taskId, userId) => {
 export const createTask = async (taskData) => {
     const url = `${process.env.API_SECRET_URL}/api/v1/tasks`;
     const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(taskData),
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(taskData),
     };
     const res = await fetchBase(url, options);
     return res;
-};
+  };
 
-export const updateTask = async (id, taskData) => {
-    const url = `${process.env.API_SECRET_URL}/api/v1/tasks/${id}`;
+export const updateTask = async ( taskData) => {
+    const url = `${process.env.API_SECRET_URL}/api/v1/tasks`;
     const options = {
         method: 'PUT',
         headers: {

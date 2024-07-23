@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoIosAdd } from "react-icons/io";
 import { BsThreeDotsVertical } from "react-icons/bs";
 
 import { getTodayFormatted } from "@/utils/displayUtils";
 import TaskModalAdd from "./TaskModalAdd";
+import CreateSubTaskModal from "./SubTaskModelAdd";
 import { RiArrowDropDownLine } from "react-icons/ri";
+import { useCreateSubTask, useDeleteSubTask, useUpdateSubTask } from "@/data/useSubTask";
 import {
   Card,
   CardBody,
@@ -22,264 +24,107 @@ import {
   Chip,
 } from "@nextui-org/react";
 import { useGetProject } from "@/data/useProjects";
+import {useDeleteTask, useUpdateTask} from "@/data/useTask";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import TaskModalEdit from "./TaskModalEdit";
 
-const TaskTab = () => {
+const TaskTab = ({ project }) => {
   const [filterTask, setFilterTask] = useState("My Task");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen: isEditModalOpen, onOpen: onOpenEditModal, onOpenChange: onEditModalOpenChange } = useDisclosure();
+  const [projectTask, setProjectTask] = useState([]);
+  const [isSubTaskModalOpen, setSubTaskModalOpen] = useState(false);
+  const [currentTaskId, setCurrentTaskId] = useState(null);
+  const [currentTask, setCurrentTask] = useState(null);
+  const { data: projectDetails, isLoading, error } = useGetProject(project.id);
+  const { mutate: createSubTask } = useCreateSubTask();
+  const { mutate: deleteTask } = useDeleteTask();
+  const { mutate: deleteSubTask } = useDeleteSubTask();
+  const { mutate: updateTask } = useUpdateTask();
+  const { mutate: updateSubTask } = useUpdateSubTask();
+
+
+
+
+  useEffect(() => {
+    if (projectDetails) {
+      setProjectTask(projectDetails.tasks);
+    }
+  }, [projectDetails]);
+
+  if (isLoading) return <div>Loading project tasks...</div>;
+  if (error) return <div>Error loading project tasks</div>;
 
   const onClickFilter = (e) => {
-    console.log(e);
   };
 
-  const onChangeStatus = (item) => {
-    console.log(item);
+  const onChangeStatus = (task) => {
+    const newStatus = task.status === 'Done' ? 'On Processing' : 'Done';
+    const taskData = {
+      id: task.id,
+      name: task.name,
+      description: task.description, 
+      status: newStatus,
+      priority: task.priority,
+    };
+
+
+    updateTask(taskData,{
+      onSuccess : (data ) => (
+        toast.success("Task has been update!")
+      ),
+    })
+  };
+  const onChangeSubStatus = (sub) => {
+    const newStatus = task.status === 'Done' ? 'On Processing' : 'Done';
+    const subTaskData = {
+      "task-id": sub['task-id'],
+      description: sub.description,
+      "due-date": sub['due-date'],
+      "assign-user-id": sub['assign-user-id'],
+      status: newStatus,
+      name: sub.name,
+    }
+    updateSubTask(subTaskData,{
+      onSuccess: (data) => (
+        toast.success("Sub Task has been update!")
+      )
+    })
+
+  }
+
+  const onAddedSubTask = (taskId) => {
+    setCurrentTaskId(taskId);
+    setSubTaskModalOpen(true);
   };
 
-  const onAddedSubTask = (item) => {
-    console.log(item);
+  const handleAddSubTask = (subTaskData) => {
+    createSubTask(subTaskData, {
+      onSuccess: () => {
+        toast.success("Task has been created! ");
+      },
+    });
   };
-
-  const items = [
-    {
-      title: "Today",
-      count: 3,
-      data: [
-        {
-          name: "Fix bug",
-          "due-date": "Today",
-          users: [
-            "Nguyen Tran Trung Quan",
-            "Nguyen Thanh Cong",
-            "Nguyen Quoc Thien",
-          ],
-          "sub-task": [
-            {
-              name: "Fix bug 2",
-              users: [
-                "Nguyen Tran Trung Quan",
-                "Nguyen Thanh Cong",
-                "Nguyen Quoc Thien",
-              ],
-              "due-date": "Today",
-              status: false,
-            },
-          ],
-          status: false,
-        },
-        {
-          name: "Fix bug",
-          "due-date": "Today",
-          users: [
-            "Nguyen Tran Trung Quan",
-            "Nguyen Thanh Cong",
-            "Nguyen Quoc Thien",
-          ],
-          "sub-task": [
-            {
-              name: "Fix bug 2",
-              users: [
-                "Nguyen Tran Trung Quan",
-                "Nguyen Thanh Cong",
-                "Nguyen Quoc Thien",
-              ],
-              "due-date": "Today",
-              status: false,
-            },
-          ],
-          status: false,
-        },
-        {
-          name: "Fix bug",
-          "due-date": "Today",
-          users: [
-            "Nguyen Tran Trung Quan",
-            "Nguyen Thanh Cong",
-            "Nguyen Quoc Thien",
-          ],
-          "sub-task": [
-            {
-              name: "Fix bug 2",
-              users: [
-                "Nguyen Tran Trung Quan",
-                "Nguyen Thanh Cong",
-                "Nguyen Quoc Thien",
-              ],
-              "due-date": "Today",
-              status: false,
-            },
-          ],
-          status: false,
-        },
-      ],
-    },
-    {
-      title: "Upcoming",
-      count: 3,
-      data: [
-        {
-          name: "Fix bug",
-          "due-date": "Today",
-          users: [
-            "Nguyen Tran Trung Quan",
-            "Nguyen Thanh Cong",
-            "Nguyen Quoc Thien",
-          ],
-          "sub-task": [
-            {
-              name: "Fix bug 2",
-              users: [
-                "Nguyen Tran Trung Quan",
-                "Nguyen Thanh Cong",
-                "Nguyen Quoc Thien",
-              ],
-              "due-date": "Today",
-              status: false,
-            },
-          ],
-          status: false,
-        },
-        {
-          name: "Fix bug",
-          "due-date": "Today",
-          users: [
-            "Nguyen Tran Trung Quan",
-            "Nguyen Thanh Cong",
-            "Nguyen Quoc Thien",
-          ],
-          "sub-task": [
-            {
-              name: "Fix bug 2",
-              users: [
-                "Nguyen Tran Trung Quan",
-                "Nguyen Thanh Cong",
-                "Nguyen Quoc Thien",
-              ],
-              "due-date": "Today",
-              status: false,
-            },
-          ],
-          status: false,
-        },
-        {
-          name: "Fix bug",
-          "due-date": "Today",
-          users: [
-            "Nguyen Tran Trung Quan",
-            "Nguyen Thanh Cong",
-            "Nguyen Quoc Thien",
-          ],
-          "sub-task": [
-            {
-              name: "Fix bug 2",
-              users: [
-                "Nguyen Tran Trung Quan",
-                "Nguyen Thanh Cong",
-                "Nguyen Quoc Thien",
-              ],
-              "due-date": "Today",
-              status: false,
-            },
-          ],
-          status: false,
-        },
-      ],
-    },
-    {
-      title: "Tomorrow",
-      count: 3,
-      data: [
-        {
-          name: "Fix bug",
-          "due-date": "Today",
-          users: [
-            "Nguyen Tran Trung Quan",
-            "Nguyen Thanh Cong",
-            "Nguyen Quoc Thien",
-          ],
-          "sub-task": [
-            {
-              name: "Fix bug 2",
-              users: [
-                "Nguyen Tran Trung Quan",
-                "Nguyen Thanh Cong",
-                "Nguyen Quoc Thien",
-              ],
-              "due-date": "Today",
-              status: false,
-            },
-          ],
-          status: false,
-        },
-        {
-          name: "Fix bug",
-          "due-date": "Today",
-          users: [
-            "Nguyen Tran Trung Quan",
-            "Nguyen Thanh Cong",
-            "Nguyen Quoc Thien",
-          ],
-          "sub-task": [
-            {
-              name: "Fix bug 2",
-              users: [
-                "Nguyen Tran Trung Quan",
-                "Nguyen Thanh Cong",
-                "Nguyen Quoc Thien",
-              ],
-              "due-date": "Today",
-              status: false,
-            },
-          ],
-          status: false,
-        },
-        {
-          name: "Fix bug",
-          "due-date": "Today",
-          users: [
-            "Nguyen Tran Trung Quan",
-            "Nguyen Thanh Cong",
-            "Nguyen Quoc Thien",
-          ],
-          "sub-task": [
-            {
-              name: "Fix bug 2",
-              users: [
-                "Nguyen Tran Trung Quan",
-                "Nguyen Thanh Cong",
-                "Nguyen Quoc Thien",
-              ],
-              "due-date": "Today",
-              status: false,
-            },
-            {
-              name: "Fix bug 2",
-              users: [
-                "Nguyen Tran Trung Quan",
-                "Nguyen Thanh Cong",
-                "Nguyen Quoc Thien",
-              ],
-              "due-date": "Today",
-              status: false,
-            },
-            {
-              name: "Fix bug 2",
-              users: [
-                "Nguyen Tran Trung Quan",
-                "Nguyen Thanh Cong",
-                "Nguyen Quoc Thien",
-              ],
-              "due-date": "Today",
-              status: true,
-            },
-          ],
-          status: false,
-        },
-      ],
-    },
-  ];
-
-  // const { data: items, isLoading, error } = useGetProject();
-
+  const handleEditTask = (task) => {
+    setCurrentTask(task); 
+    onOpenEditModal(); 
+  }
+  const handleDeleteTask = (taskId) => {
+    deleteTask(taskId, {
+      onSuccess: (data) => {
+        toast.success("Task has been deleted ");
+        setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+      },
+    });
+  };
+  const handleDeleteSubTask = (subId) => {
+    deleteSubTask(subId, {
+      onSuccess: (data) => {
+        toast.success("Sub Task has been deleted ");
+      },
+    });
+  };
   return (
     <Card shadow="none">
       <CardHeader className="flex flex-row justify-between items-center">
@@ -311,25 +156,35 @@ const TaskTab = () => {
           isOpen={isOpen}
           onOpen={onOpen}
           onOpenChange={onOpenChange}
+          projectId={project.id}
         />
+        <CreateSubTaskModal
+          isOpen={isSubTaskModalOpen}
+          onOpenChange={setSubTaskModalOpen}
+          taskId={currentTaskId}
+          onCreateSubTask={handleAddSubTask}
+          projectId={project.id}
+        />
+        <TaskModalEdit isOpen={isEditModalOpen} onOpenChange={onEditModalOpenChange} projectId={project.id} task={currentTask} />
+
       </CardHeader>
       <CardBody>
         <Accordion defaultExpandedKeys={["1"]}>
-          {items?.map((item, index) => (
+          {projectTask.map((category, index) => (
             <AccordionItem
               key={index}
-              aria-label={item.title}
+              aria-label={category.title}
               title={
                 <div className="flex flex-row gap-2 items-center">
-                  <p className="font-semibold text-md">{item.title}</p>
+                  <p className="font-semibold text-md">{category.title}</p>
                   <span className="font-semibold text-sm text-black/50">
-                    {item?.title === "Today" ? (
+                    {category.title === "Today" ? (
                       <div className="flex flew-row items-center gap-2">
                         <Chip>{getTodayFormatted()}</Chip>
-                        <p>{`${item.count} tasks remaining to completed`}</p>
+                        <p>{`${category.count} tasks remaining to be completed`}</p>
                       </div>
                     ) : (
-                      <p>{item.count} tasks remaining to completed</p>
+                      <p>{category.count} tasks remaining to be completed</p>
                     )}
                   </span>
                 </div>
@@ -337,16 +192,16 @@ const TaskTab = () => {
               classNames={{ content: "flex flex-col gap-4 w-full" }}
             >
               <Accordion>
-                {item.data.map((task, index) => (
+                {category.data.map((task, index) => (
                   <AccordionItem
-                    key={task.name + index}
+                    key={task.id}
                     title={
                       <div
                         className="flex flex-row justify-between items-center"
-                        key={task.name}
+                        key={task.id}
                       >
                         <Checkbox
-                          defaultSelected={task.status}
+                          defaultSelected={task.status === "Done"}
                           onValueChange={() => onChangeStatus(task)}
                           lineThrough
                           title={task.name}
@@ -362,20 +217,18 @@ const TaskTab = () => {
                           Due {task["due-date"]}
                         </p>
                         <div className="flex -space-x-3 rtl:space-x-reverse">
-                          {task.users?.map((user) => (
                             <Avatar
-                              name={user}
+                              name={task.user}
                               size="sm"
-                              key={user}
-                              getInitials={(name) => name.charAt(0)}
+                              key={task.id}
+                              getInitials={(name) => name.charAt(0)}z
                             />
-                          ))}
                         </div>
                         <div className="flex flex-row gap-2">
                           <Button
                             isIconOnly
                             className="bg-transparent"
-                            onClick={() => onAddedSubTask(task)}
+                            onClick={() => onAddedSubTask(task.id )}
                           >
                             <IoIosAdd />
                           </Button>
@@ -386,24 +239,24 @@ const TaskTab = () => {
                               </Button>
                             </DropdownTrigger>
                             <DropdownMenu>
-                              <DropdownItem>Edit</DropdownItem>
-                              <DropdownItem>Delete</DropdownItem>
+                              <DropdownItem onClick={() =>handleEditTask(task) }>Edit</DropdownItem>
+                              <DropdownItem onClick={() => handleDeleteTask(task.id)} >Delete</DropdownItem>
                             </DropdownMenu>
                           </Dropdown>
                         </div>
                       </div>
                     }
                   >
-                    {task["sub-task"].map((sub, index) => (
+                    {task["sub-tasks"].map((sub, index) => (
                       <div
                         className="flex flex-row justify-between items-center px-12 mb-4"
-                        key={sub.name}
+                        key={sub.description}
                       >
                         <Checkbox
-                          defaultSelected={sub.status}
+                          defaultSelected={sub.status==="Done"}
                           lineThrough
                           title={sub.name}
-                          onClick={() => onChangeStatus(sub)}
+                          onClick={() => onChangeSubStatus(sub)}
                           classNames={{
                             label:
                               "max-w-full flex flex-row w-full justify-between",
@@ -416,14 +269,13 @@ const TaskTab = () => {
                           Due {sub["due-date"]}
                         </p>
                         <div className="flex -space-x-3 rtl:space-x-reverse">
-                          {sub.users?.map((user) => (
                             <Avatar
-                              name={user}
+                              name={sub['assign-user']}
                               size="sm"
-                              key={user}
+                              key={sub.id}
                               getInitials={(name) => name.charAt(0)}
                             />
-                          ))}
+                    
                         </div>
                         <Dropdown placement="bottom-end">
                           <DropdownTrigger>
@@ -432,8 +284,8 @@ const TaskTab = () => {
                             </Button>
                           </DropdownTrigger>
                           <DropdownMenu>
-                            <DropdownItem>Edit</DropdownItem>
-                            <DropdownItem>Delete</DropdownItem>
+                            <DropdownItem >Edit</DropdownItem>
+                            <DropdownItem onClick={() => handleDeleteSubTask(sub.id)}  >Delete</DropdownItem>
                           </DropdownMenu>
                         </Dropdown>
                       </div>

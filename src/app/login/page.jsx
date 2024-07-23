@@ -18,7 +18,7 @@ const page = async () => {
               aria-disabled="true"
               className="w-full text-center text-4xl font-bold"
             >
-              Kios Management System
+              Intern Managerment System
             </p>
           </section>
           <Suspense>

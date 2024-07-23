@@ -138,13 +138,15 @@ const users = [
   },
 ];
 
+
+
 const RecentIntern = () => {
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 4;
-
+    
   const pages = Math.ceil(users.length / rowsPerPage);
 
-  const items = React.useMemo(() => {
+  const Tasks = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
@@ -177,7 +179,7 @@ const RecentIntern = () => {
         <TableColumn key="duration">DURATION</TableColumn>
         <TableColumn key="level">DURATION</TableColumn>
       </TableHeader>
-      <TableBody items={items}>
+      <TableBody items={Tasks}>
         {(item) => (
           <TableRow key={item.title}>
             {(columnKey) => (

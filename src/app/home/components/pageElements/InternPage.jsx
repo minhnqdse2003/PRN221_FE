@@ -1,7 +1,8 @@
 import React from "react";
 import WelcomeBanner from "../ui/WelcomeBanner";
 
-const InternPage = () => {
+const InternPage = async () => {
+
   return (
     <div>
       <WelcomeBanner />

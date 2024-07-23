@@ -10,6 +10,9 @@ import {
 import { IoFastFoodSharp } from "react-icons/io5";
 import { RiUserSettingsFill } from "react-icons/ri";
 import { BsCartCheckFill } from "react-icons/bs";
+import { GoProjectRoadmap } from "react-icons/go";
+import { BsBodyText } from "react-icons/bs";
+
 import { SidebarContext } from "@/context/SidebarContext";
 import { usePathname } from "next/navigation";
 import UserSection from "./UserSection";
@@ -22,14 +25,20 @@ const iconSize = {
 export const sidebarItems = [
   {
     content: "Dashboard",
-    href: "/",
+    href: "/home",
     icon: <MdDashboard {...iconSize} />,
     role: "business",
   },
   {
     content: "Training Programs Management",
     href: "/trainingprograms",
-    icon: <IoFastFoodSharp {...iconSize} />,
+    icon: <BsBodyText {...iconSize} />,
+    role: "business",
+  },
+  {
+    content: "Project Management",
+    href: "/projects",
+    icon: <GoProjectRoadmap {...iconSize} />,
     role: "business",
   },
   {
@@ -38,12 +47,7 @@ export const sidebarItems = [
     icon: <RiUserSettingsFill {...iconSize} />,
     role: "business",
   },
-  {
-    content: "Order",
-    href: "/trainingprograms",
-    icon: <BsCartCheckFill {...iconSize} />,
-    role: "business",
-  },
+
 ];
 
 const Sidebar = () => {

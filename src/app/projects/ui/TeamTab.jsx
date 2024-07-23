@@ -1,8 +1,11 @@
+"use client";
 import {
+  Avatar,
   Button,
   Card,
   CardBody,
-  useDisclosure,
+  CardHeader,
+  Chip,
   Table,
   TableHeader,
   TableColumn,
@@ -10,12 +13,15 @@ import {
   TableRow,
   TableCell,
   User,
-  Chip,
   Tooltip,
+  useDisclosure,
 } from "@nextui-org/react";
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { IoIosAdd, IoIosRemoveCircleOutline } from "react-icons/io";
 import TeamModalAdd from "./TeamModalAdd";
+import { useGetProject, usePostProjectMemberPosition, useRemoveMemberFromProject } from "@/data/useProjects";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const columns = [
   { name: "NAME", uid: "name" },
@@ -23,46 +29,55 @@ const columns = [
   { name: "ACTIONS", uid: "actions" },
 ];
 
-const users = [
-  {
-    id: 1,
-    name: "Tony Reichert",
-    position: "CEO",
-    email: "tony.reichert@example.com",
-  },
-  {
-    id: 2,
-    name: "Zoey Lang",
-    position: "Technical Lead",
-    email: "zoey.lang@example.com",
-  },
-  {
-    id: 3,
-    name: "Jane Fisher",
-    position: "Senior Developer",
-    email: "jane.fisher@example.com",
-  },
-  {
-    id: 4,
-    name: "William Howard",
-    position: "Community Manager",
-    email: "william.howard@example.com",
-  },
-  {
-    id: 5,
-    name: "Kristen Copper",
-    position: "Sales Manager",
-    email: "kristen.cooper@example.com",
-  },
-];
-
-const TeamTab = () => {
+const TeamTab = ({ selectedProject }) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { data: projectDetails, isLoading, error } = useGetProject(selectedProject.id);
+  const [users, setUsers] = useState([]);
+  const [currentUserId, setCurrentUserId] = useState(null);
+
+  useEffect(() => {
+    if (projectDetails) {
+      setUsers(projectDetails.users);
+    }
+  }, [projectDetails]);
+
+  const { mutate: removeMember } = useRemoveMemberFromProject(selectedProject.id, {
+    onSuccess: () => {
+      setUsers((prevUsers) => prevUsers.filter((u) => u.id !== currentUserId));
+      toast.success("User removed successfully");
+    },
+    onError: (error) => {
+      toast.error(`Error removing user: ${error.message}`);
+    },
+  });
+
+  const { mutate: addMember } = usePostProjectMemberPosition();
+
   const onClickDeleteUser = (user) => {
-    console.log(user);
+    setCurrentUserId(user.id);
+    removeMember({ 'user-id': user.id });
   };
 
-  const renderCell = React.useCallback((user, columnKey) => {
+  const handleAddMember = (user) => {
+    if (!user["user-id"] || !user.position) {
+      toast.error("User ID and position are required.");
+      return;
+    }
+    if (users.some((u) => u.id === user["user-id"])) {
+      toast.error("User is already a member of the project.");
+      return;
+    }
+    const userData = {
+      "user-id": user["user-id"],
+      "position": user.position,
+    };
+    addMember({ projectId: selectedProject.id, userData}, {
+      onSuccess: () => {
+        toast.success("Add successfull!");
+      }
+    });
+  };
+  const renderCell = useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
 
     switch (columnKey) {
@@ -72,11 +87,9 @@ const TeamTab = () => {
             avatarProps={{ radius: "lg", src: user.avatar }}
             description={user.email}
             name={cellValue}
-          >
-            {user.email}
-          </User>
+          />
         );
-      case "role":
+      case "position":
         return (
           <div className="flex flex-col">
             <p className="text-bold text-sm capitalize">{cellValue}</p>
@@ -100,46 +113,53 @@ const TeamTab = () => {
     }
   }, []);
 
+  if (isLoading) return <div>Loading team members...</div>;
+  if (error) return <div>Error loading team members: {error.message}</div>;
+
   return (
-    <Card shadow="none">
-      <CardBody>
-        <div className="flex flex-row justify-between mb-4">
-          <div className="font-semibold text-xl">Team</div>
-          <Button onPress={onOpen} startContent={<IoIosAdd />}>
-            Add Team
-          </Button>
-          <TeamModalAdd
-            isOpen={isOpen}
-            onOpen={onOpen}
-            onOpenChange={onOpenChange}
-          />
-        </div>
-        <Table aria-label="Example table with custom cells" removeWrapper>
-          <TableHeader columns={columns}>
-            {(column) => (
-              <TableColumn
-                key={column.uid}
-                align={column.uid === "actions" ? "center" : "start"}
-              >
-                {column.name}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody
-            items={users}
-            emptyContent="No team member is now available"
-          >
-            {(item) => (
-              <TableRow key={item.id}>
-                {(columnKey) => (
-                  <TableCell>{renderCell(item, columnKey)}</TableCell>
-                )}
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </CardBody>
-    </Card>
+    <>
+      <ToastContainer />
+      <Card shadow="none">
+        <CardBody>
+          <div className="flex flex-row justify-between mb-4">
+            <div className="font-semibold text-xl">Team</div>
+            <Button onPress={onOpen} startContent={<IoIosAdd />}>
+              Add Team
+            </Button>
+            <TeamModalAdd
+              isOpen={isOpen}
+              onOpen={onOpen}
+              onOpenChange={onOpenChange}
+              onAddMember={handleAddMember}
+            />
+          </div>
+          <Table aria-label="Example table with custom cells" removeWrapper>
+            <TableHeader columns={columns}>
+              {(column) => (
+                <TableColumn
+                  key={column.uid}
+                  align={column.uid === "actions" ? "center" : "start"}
+                >
+                  {column.name}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody
+              items={users}
+              emptyContent="No team member is now available"
+            >
+              {(item) => (
+                <TableRow key={item.id}>
+                  {(columnKey) => (
+                    <TableCell>{renderCell(item, columnKey)}</TableCell>
+                  )}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardBody>
+      </Card>
+    </>
   );
 };
 

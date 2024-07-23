@@ -1,3 +1,4 @@
+"use client"
 import {
   Table,
   TableBody,
@@ -8,6 +9,10 @@ import {
   getKeyValue,
 } from "@nextui-org/react";
 import React from "react";
+
+import { useGetTasks } from "@/data/useTask";
+import { useEffect, useState } from "react";
+
 
 function getDaysInMonth(month, year) {
   const daysInMonth = [31, null, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -56,6 +61,21 @@ function getRandomMonthDayLy() {
 }
 
 const InternTasks = () => {
+
+  
+  const { data: tasks, isLoading, error } = useGetTasks("OnGoing");
+
+  const [taskItems, setTaskItems] = useState([]);
+
+  useEffect(() => {
+    if (tasks) {
+      console.log('Tasks:', tasks);
+      setTaskItems(tasks.data);
+    }
+  }, [tasks]);
+  
+  if (error) return <div>Error: {error.message}</div>;
+
   const users = [
     {
       title: "Data Scientist",
@@ -95,7 +115,7 @@ const InternTasks = () => {
 
   return (
     <div className="flex flex-col gap-4 bg-white p-6 rounded-xl">
-      <p className="font-semibold text-2xl">Recent Task</p>
+      <p className="font-semibold text-2xl">OnGoing Task</p>
       <Table
         aria-label="Example table with client side pagination"
         removeWrapper
@@ -103,18 +123,19 @@ const InternTasks = () => {
         selectionMode="single"
         defaultSelectedKeys={["Product Manager"]}
       >
-        <TableHeader>
-          <TableColumn key="title">Task</TableColumn>
+         <TableHeader>
+          <TableColumn key="name">Task</TableColumn>
           <TableColumn key="description">Description</TableColumn>
-          <TableColumn key="duration">Due Date</TableColumn>
-          <TableColumn key="level">Priority</TableColumn>
+          <TableColumn key="dueDate">Due Date</TableColumn>
+          <TableColumn key="priority">Priority</TableColumn>
         </TableHeader>
-        <TableBody items={users}>
+        <TableBody emptyContent={"No Task Found"} items={taskItems}>
           {(item) => (
-            <TableRow key={item.title}>
-              {(columnKey) => (
-                <TableCell>{getKeyValue(item, columnKey)}</TableCell>
-              )}
+            <TableRow key={item.id}>
+              <TableCell>{item.name}</TableCell>
+              <TableCell>{item.description}</TableCell>
+              <TableCell>{item['due-date']}</TableCell>
+              <TableCell>{item.priority}</TableCell>
             </TableRow>
           )}
         </TableBody>

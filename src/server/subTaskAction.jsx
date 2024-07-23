@@ -1,3 +1,5 @@
+"use server"
+
 import { fetchBase } from "./baseAction";
 
 export const createSubTask = async (taskData) => {
@@ -26,7 +28,7 @@ export const updateSubTask = async (taskData) => {
     return res;
 };
 
-export const deleteTask = async (id) => {
+export const deleteSubTask = async (id) => {
     const url = `${process.env.API_SECRET_URL}/api/v1/subtasks/${id}`;
     const options = {
         method: 'DELETE',

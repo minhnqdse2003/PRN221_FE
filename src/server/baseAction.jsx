@@ -3,7 +3,7 @@ const { getServerSession } = require("next-auth");
 
 export const fetchBase = async (url, options = {}) => {
   const session = await getServerSession(authOptions);
-
+ 
   if (!session) {
     throw new Error("Unauthorized");
   }
@@ -11,6 +11,7 @@ export const fetchBase = async (url, options = {}) => {
   const defaultHeaders = {
     Authorization: `Bearer ${session.user.accessToken}`,
   };
+
 
   const mergedOptions = {
     ...options,
@@ -23,6 +24,7 @@ export const fetchBase = async (url, options = {}) => {
   const response = await fetch(url, mergedOptions);
 
   if (!response.ok) {
+    console.log(response);
     throw new Error("Network response was not ok");
   }
 
