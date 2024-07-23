@@ -27,31 +27,31 @@ export const sidebarItems = [
     content: "Dashboard",
     href: "/home",
     icon: <MdDashboard {...iconSize} />,
-    role: "business",
+    role: ["Intern"],
   },
   {
     content: "Training Programs Management",
     href: "/trainingprograms",
     icon: <BsBodyText {...iconSize} />,
-    role: "business",
+    role: ["Intern", "Project Manager", "Training Manager", "Admin"],
   },
   {
     content: "Project Management",
     href: "/projects",
     icon: <GoProjectRoadmap {...iconSize} />,
-    role: "business",
+    role: ["Intern", "Project Manager"],
   },
   {
     content: "Intern Management",
     href: "/members",
     icon: <RiUserSettingsFill {...iconSize} />,
-    role: "business",
+    role: ["Admin"],
   },
-
 ];
 
 const Sidebar = () => {
   const { collapsed, handleToggle } = useContext(SidebarContext);
+  const { data: session } = useSession();
   const pathname = usePathname();
   function isPathMatch(item) {
     if (pathname !== item.href && item.href !== "/") {
@@ -63,6 +63,12 @@ const Sidebar = () => {
   if (pathname === "/login") {
     return;
   }
+
+  const userRole = session?.user?.role || "";
+
+  const filteredSidebarItems = sidebarItems.filter((item) =>
+    item.role.includes(userRole)
+  );
 
   return (
     <div
@@ -85,7 +91,7 @@ const Sidebar = () => {
             />
             <p aria-disabled="true" className="side-content">
               Intern Managerment System
-                          </p>
+            </p>
           </Link>
           <button
             className={`flex items-center justify-center cursor-pointer hover:bg-btn ${
@@ -101,7 +107,7 @@ const Sidebar = () => {
           </button>
         </div>
         <ul className="sidebar-ul h-2/3 overflow-y-auto">
-          {sidebarItems.map((item) => (
+          {filteredSidebarItems.map((item) => (
             <li
               key={item.content}
               className="hover:bg-btn w-full transition-all duration-500"
