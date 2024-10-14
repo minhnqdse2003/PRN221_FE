@@ -59,10 +59,18 @@ const TeamTab = ({ selectedProject }) => {
   };
 
   const handleAddMember = (user) => {
+    const validPositions = ["BE", "FE", "Tester"];
+  
     if (!user["user-id"] || !user.position) {
       toast.error("User ID and position are required.");
       return;
     }
+    
+    if (!validPositions.includes(user.position)) {
+      toast.error("Position must be BE, FE, or Tester.");
+      return;
+    }
+  
     if (users.some((u) => u.id === user["user-id"])) {
       toast.error("User is already a member of the project.");
       return;
@@ -73,7 +81,7 @@ const TeamTab = ({ selectedProject }) => {
     };
     addMember({ projectId: selectedProject.id, userData}, {
       onSuccess: () => {
-        toast.success("Add successfull!");
+        toast.success("Add successfull")
       }
     });
   };

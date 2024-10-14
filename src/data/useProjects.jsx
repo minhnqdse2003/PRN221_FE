@@ -21,6 +21,7 @@ export const useCreateProject = (onClose) => {
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey:"createProject",
     mutationFn: async (projectData) => await createProject(projectData),
     onSuccess: () => {
       queryClient.invalidateQueries(["projects"]);
@@ -32,7 +33,7 @@ export const useCreateProject = (onClose) => {
   });
 };
 
-export const useRemoveProject = (onClose) => {
+export const useRemoveProject = () => {
   const queryClient = useQueryClient();
 
   return useMutation({

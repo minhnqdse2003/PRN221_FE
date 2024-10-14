@@ -50,6 +50,7 @@ const ReportsTab = ({ selectedProject }) => {
           isOpen={isOpen}
           onOpen={onOpen}
           onOpenChange={onOpenChange}
+          projectId={projectDetails.detail.id}
         />
       </div>
       <div className="grid grid-cols-3 gap-4">
